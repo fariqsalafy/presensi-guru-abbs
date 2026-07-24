@@ -228,7 +228,10 @@ async function loadData() {
         const key = teacher + '|' + d;
         const rec = lookup[key];
         if (rec) {
-          html += '<td class="present" onclick="openModal(\'' + rec.id + '\')">✅</td>';
+          const ct = new Date(rec.created_at);
+          const ch = (ct.getUTCHours() + 7) % 24;
+          const cm = String(ct.getUTCMinutes()).padStart(2,'0');
+          html += '<td class="present" onclick="openModal(\'' + rec.id + '\')">' + String(ch).padStart(2,'0') + ':' + cm + '</td>';
         } else {
           const dObj = new Date(d + 'T00:00:00');
           const today = new Date();
