@@ -2,7 +2,6 @@
   "framework": null,
   "rewrites": [
     { "source": "/", "destination": "/presensi.html" },
-    { "source": "/presensi", "destination": "/presensi.html" },
     { "source": "/rekap", "destination": "/rekap.html" }
   ]
 }

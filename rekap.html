@@ -34,6 +34,7 @@ th {
   font-size: 11px; letter-spacing: 0.5px;
 }
 th.sticky-name { position: sticky; left: 0; z-index: 42; background: #1e293b; min-width: 160px; text-align: left; padding-left: 10px; }
+th.foto-col { min-width: 36px; }
 td {
   padding: 6px; text-align: center; border-bottom: 1px solid #1e293b;
   vertical-align: middle;
@@ -50,6 +51,8 @@ td.absent { color: #334155; font-size: 12px; }
 td.stat { font-weight: 700; font-size: 13px; }
 td.tot { color: #facc15; }
 td.hadir { color: #4ade80; }
+/* FOTO COL */
+td.foto-col { font-size: 16px; cursor: default; min-width: 36px; }
 /* NO COL */
 td.no { color: #64748b; font-size: 11px; }
 /* LOADING */
@@ -148,9 +151,18 @@ const TEACHERS = [
 // ====== DATE HELPERS ======
 function getDateRange() {
   const now = new Date();
-  const start = new Date(now);
-  start.setDate(now.getDate() + 1); // besok
-  const end = new Date(now.getFullYear(), now.getMonth() + 1, 20); // 20 bulan depan
+  const curY = now.getFullYear();
+  const curM = now.getMonth();
+  // Periode: 21 bulan ini → 20 bulan depan
+  let startM = curM, startY = curY;
+  if (now.getDate() < 21) { // masih periode sebelumnya
+    startM = curM - 1;
+    if (startM < 0) { startM = 11; startY--; }
+  }
+  const endM = startM + 1;
+  const endY = startY + (endM > 11 ? 1 : 0);
+  const start = new Date(startY, startM, 21);
+  const end = new Date(endY, endM % 12, 20);
   const dates = [];
   const d = new Date(start);
   while (d <= end) {
@@ -162,8 +174,8 @@ function getDateRange() {
 
 function fmtDate(iso) {
   const d = new Date(iso + 'T00:00:00');
-  const days = ['Min','Sen','Sel','Rab','Kam','Jum','Sab'];
-  return days[d.getDay()] + ' ' + d.getDate();
+  const months = ['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des'];
+  return d.getDate() + ' ' + months[d.getMonth()];
 }
 
 function fmtDateFull(iso) {
@@ -221,17 +233,20 @@ async function loadData() {
 
     // Build table
     let html = '<div class="wrap"><table><thead><tr>';
-    html += '<th class="sticky-name">Nama Guru</th>';
+    html += '<th class="sticky-name">Nama</th>';
+    html += '<th class="foto-col">Foto</th>';
     for (const d of dates) {
       html += '<th>' + fmtDate(d) + '</th>';
     }
-    html += '<th class="tot">TOT</th>';
-    html += '<th class="hadir">Hadir</th>';
+    html += '<th class="tot">ToT</th>';
+    html += '<th class="hadir">Total Hadir</th>';
     html += '</tr></thead><tbody>';
 
-    for (const teacher of TEACHERS) {
+    for (let i = 0; i < TEACHERS.length; i++) {
+      const teacher = TEACHERS[i];
       html += '<tr>';
       html += '<td class="sticky-name">' + teacher + '</td>';
+      html += '<td class="foto-col">📷</td>';
       for (const d of dates) {
         const key = teacher + '|' + d;
         const rec = lookup[key];
