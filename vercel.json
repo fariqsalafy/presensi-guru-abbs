@@ -1,0 +1,7 @@
+{
+  "name": "absengurusmpabbs",
+  "framework": null,
+  "rewrites": [
+    { "source": "/presensi", "destination": "/presensi.html" }
+  ]
+}
