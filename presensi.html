@@ -16,29 +16,29 @@ html, body {
 #app {
   display: flex; flex-direction: column;
   height: 100%; max-width: 480px; margin: 0 auto;
-  padding: 8px 12px 10px;
-  gap: 6px;
+  padding: 14px 18px 18px;
+  gap: 10px;
 }
 /* ===== HEADER ===== */
 .header {
   text-align: center; flex-shrink: 0;
-  padding: 4px 0 2px;
+  padding: 6px 0 2px;
 }
 .header h1 {
-  font-size: 17px; font-weight: 700;
-  color: #fbbf24; letter-spacing: 1.5px;
-  text-shadow: 0 0 20px rgba(251,191,36,0.15);
+  font-size: 20px; font-weight: 700;
+  color: #fbbf24; letter-spacing: 2px;
+  text-shadow: 0 0 24px rgba(251,191,36,0.18);
 }
 .header .sub {
-  font-size: 10px; color: #94a3b8; letter-spacing: 2px;
-  text-transform: uppercase; margin-top: -1px;
+  font-size: 11px; color: #94a3b8; letter-spacing: 2.5px;
+  text-transform: uppercase; margin-top: 0;
 }
 /* ===== TEACHER SELECTOR ===== */
 .teacher-area { flex-shrink: 0; }
 .search-wrap { position: relative; }
 .search-wrap input {
-  width: 100%; padding: 8px 12px 8px 34px;
-  border: 1.5px solid #1e293b; border-radius: 10px;
+  width: 100%; padding: 10px 14px 10px 38px;
+  border: 1.5px solid #1e293b; border-radius: 12px;
   background: #0f172a; color: #e2e8f0;
   font-size: 14px; outline: none;
   transition: border 0.2s;
@@ -46,35 +46,35 @@ html, body {
 .search-wrap input:focus { border-color: #fbbf24; }
 .search-wrap input::placeholder { color: #475569; }
 .search-icon {
-  position: absolute; left: 10px; top: 50%;
+  position: absolute; left: 12px; top: 50%;
   transform: translateY(-50%);
-  color: #475569; font-size: 16px;
+  color: #475569; font-size: 16px; pointer-events: none;
 }
 .dropdown-wrap {
-  position: relative; margin-top: 4px;
+  position: relative; margin-top: 6px;
 }
 .dropdown-wrap select {
-  width: 100%; padding: 8px 12px;
-  border: 1.5px solid #1e293b; border-radius: 10px;
+  width: 100%; padding: 10px 14px;
+  border: 1.5px solid #1e293b; border-radius: 12px;
   background: #0f172a; color: #e2e8f0;
-  font-size: 13px; outline: none;
+  font-size: 14px; outline: none;
   appearance: none; cursor: pointer;
   -webkit-appearance: none;
 }
 .dropdown-wrap::after {
-  content: '▾'; position: absolute; right: 12px; top: 50%;
+  content: '▾'; position: absolute; right: 14px; top: 50%;
   transform: translateY(-50%); color: #fbbf24;
-  pointer-events: none; font-size: 12px;
+  pointer-events: none; font-size: 13px;
 }
 .dropdown-wrap select:focus { border-color: #fbbf24; }
 .dropdown-wrap select option {
   background: #0f172a; color: #e2e8f0;
-  padding: 4px;
+  padding: 6px;
 }
 /* ===== CAMERA ===== */
 .camera-area {
   flex: 1; min-height: 0;
-  position: relative; border-radius: 12px;
+  position: relative; border-radius: 14px;
   overflow: hidden; background: #000;
   border: 1.5px solid #1e293b;
 }
@@ -88,17 +88,17 @@ html, body {
   align-items: center; justify-content: center;
   color: #475569;
 }
-.camera-area .placeholder .icon { font-size: 48px; margin-bottom: 6px; }
-.camera-area .placeholder .text { font-size: 12px; }
+.camera-area .placeholder .icon { font-size: 52px; margin-bottom: 8px; }
+.camera-area .placeholder .text { font-size: 13px; }
 .camera-overlay {
   position: absolute; bottom: 0; left: 0; right: 0;
-  display: flex; justify-content: center;
-  padding: 8px;
-  background: linear-gradient(transparent, rgba(0,0,0,0.6));
+  display: flex; justify-content: center; gap: 10px;
+  padding: 12px;
+  background: linear-gradient(transparent, rgba(0,0,0,0.65));
 }
 .btn-capture, .btn-retake {
-  padding: 8px 28px; border-radius: 30px;
-  border: none; font-size: 13px; font-weight: 600;
+  padding: 9px 32px; border-radius: 30px;
+  border: none; font-size: 14px; font-weight: 600;
   cursor: pointer; transition: all 0.2s;
 }
 .btn-capture {
@@ -114,43 +114,60 @@ html, body {
   width: 100%; height: 100%; object-fit: cover;
 }
 /* ===== LOCATION & SUBMIT ===== */
-.bottom-area { flex-shrink: 0; display: flex; gap: 8px; align-items: center; }
+.bottom-area {
+  flex-shrink: 0;
+  display: flex; gap: 10px; align-items: stretch;
+}
 .location-box {
-  flex: 1; padding: 6px 10px;
-  border-radius: 10px; border: 1.5px solid #1e293b;
-  background: #0f172a; font-size: 11px;
-  min-height: 38px; display: flex; flex-direction: column;
+  flex: 1;
+  padding: 8px 12px;
+  border-radius: 12px; border: 1.5px solid #1e293b;
+  background: #0f172a; font-size: 12px;
+  display: flex; flex-direction: column;
   justify-content: center;
+}
+.location-box .top-row {
+  display: flex; align-items: center; gap: 6px;
 }
 .location-box .stat { color: #94a3b8; }
 .location-box .stat.ok { color: #4ade80; }
 .location-box .stat.loading { color: #fbbf24; }
-.location-box .coords { color: #64748b; font-size: 10px; }
+.location-box .stat.fail { color: #f87171; }
+.location-box .coords { color: #64748b; font-size: 10px; margin-top: 2px; }
+.btn-loc-refresh {
+  background: none; border: 1.5px solid #1e293b;
+  border-radius: 10px;
+  color: #64748b; cursor: pointer;
+  font-size: 18px; padding: 0 14px;
+  transition: all 0.2s; display: flex; align-items: center;
+  flex-shrink: 0;
+}
+.btn-loc-refresh:hover { border-color: #fbbf24; color: #fbbf24; }
+.btn-loc-refresh:active { transform: scale(0.92); }
 .btn-submit {
-  padding: 10px 20px; border-radius: 10px;
+  padding: 0 22px; border-radius: 12px;
   border: none; background: #fbbf24; color: #0b1120;
-  font-size: 13px; font-weight: 700; cursor: pointer;
+  font-size: 14px; font-weight: 700; cursor: pointer;
   transition: all 0.2s; white-space: nowrap;
-  min-width: 100px;
 }
 .btn-submit:disabled {
-  opacity: 0.4; cursor: not-allowed;
+  opacity: 0.35; cursor: not-allowed;
 }
 .btn-submit:not(:disabled):active { transform: scale(0.97); }
-.btn-submit.sending { background: #f59e0b; pointer-events: none; }
-/* ===== STATUS TOAST ===== */
+.btn-submit.sending { background: #d97706; pointer-events: none; }
+/* ===== TOAST ===== */
 .toast {
-  position: fixed; top: 12px; left: 50%; transform: translateX(-50%);
+  position: fixed; top: 14px; left: 50%; transform: translateX(-50%);
   padding: 10px 24px; border-radius: 12px;
   font-size: 13px; font-weight: 600; z-index: 999;
   transition: all 0.3s; opacity: 0; pointer-events: none;
-  max-width: 90%;
+  max-width: 90%; box-shadow: 0 4px 20px rgba(0,0,0,0.4);
 }
 .toast.show { opacity: 1; }
 .toast.success { background: #166534; color: #bbf7d0; }
 .toast.error { background: #991b1b; color: #fecaca; }
-/* ===== SCROLLBAR HIDE ===== */
-select::-webkit-scrollbar { width: 4px; }
+/* ===== SCROLLBAR ===== */
+select::-webkit-scrollbar { width: 5px; }
 select::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
 </style>
 </head>
@@ -194,9 +211,12 @@ select::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
   <!-- LOCATION + SUBMIT -->
   <div class="bottom-area">
     <div class="location-box" id="locationBox">
-      <div class="stat loading" id="locStatus">📍 Mendapatkan lokasi...</div>
+      <div class="top-row">
+        <span class="stat loading" id="locStatus">📍 Mendapatkan lokasi...</span>
+      </div>
       <div class="coords" id="locCoords"></div>
     </div>
+    <button class="btn-loc-refresh" id="btnLocRefresh" onclick="refreshLocation()" title="Ambil ulang lokasi">⟳</button>
     <button class="btn-submit" id="btnSubmit" onclick="submitPresensi()" disabled>
       KIRIM
     </button>
@@ -234,6 +254,7 @@ let currentPosition = null;
 let cameraStream = null;
 let isCameraReady = false;
 let isSubmitting = false;
+let isLocating = false;
 
 // ====== INIT ======
 document.addEventListener('DOMContentLoaded', () => {
@@ -287,8 +308,7 @@ async function initCamera() {
   } catch (err) {
     console.warn('Camera init error:', err);
     document.querySelector('#camPlaceholder .text').textContent =
-      '❌ Tidak bisa akses kamera. Ketuk "Ambil Foto" untuk buka kamera.';
-    // Fallback: use file input
+      '❌ Tidak bisa akses kamera. Ketuk "Ambil Foto"';
     setupFallbackCamera();
   }
 }
@@ -320,8 +340,6 @@ function setupFallbackCamera() {
     reader.readAsDataURL(file);
   };
   area.appendChild(fallbackInput);
-
-  // Override capture button to use file input
   document.getElementById('btnCapture').onclick = function() {
     document.getElementById('fallbackCam').click();
   };
@@ -329,14 +347,12 @@ function setupFallbackCamera() {
 
 function capturePhoto() {
   if (!isCameraReady) {
-    // If camera not ready but we have fallback, trigger it
     const fb = document.getElementById('fallbackCam');
     if (fb) { fb.click(); }
     return;
   }
   const video = document.getElementById('video');
   const canvas = document.getElementById('canvas');
-  // Compress to 640x480 max
   let w = video.videoWidth;
   let h = video.videoHeight;
   const MAX = 640;
@@ -376,10 +392,24 @@ function retakePhoto() {
 }
 
 // ====== LOCATION ======
+function refreshLocation() {
+  currentPosition = null;
+  isLocating = false;
+  const status = document.getElementById('locStatus');
+  status.className = 'stat loading';
+  status.textContent = '📍 Mengambil ulang lokasi...';
+  document.getElementById('locCoords').textContent = '';
+  checkReady();
+  getLocation();
+}
+
 function getLocation() {
+  if (isLocating) return;
+  isLocating = true;
   if (!navigator.geolocation) {
-    document.getElementById('locStatus').className = 'stat';
+    document.getElementById('locStatus').className = 'stat fail';
     document.getElementById('locStatus').textContent = '📍 GPS tidak didukung browser';
+    isLocating = false;
     return;
   }
   navigator.geolocation.getCurrentPosition(
@@ -395,16 +425,18 @@ function getLocation() {
       const accText = currentPosition.acc < 50 ? 'Akurat' : 'Kurang akurat';
       document.getElementById('locCoords').textContent =
         `${currentPosition.lat.toFixed(5)}, ${currentPosition.lng.toFixed(5)} ±${currentPosition.acc.toFixed(0)}m (${accText})`;
+      isLocating = false;
       checkReady();
     },
     (err) => {
       const status = document.getElementById('locStatus');
-      status.className = 'stat';
+      status.className = 'stat fail';
       status.textContent = '📍 Gagal dapat lokasi';
       document.getElementById('locCoords').textContent =
-        err.code === 1 ? 'Izin lokasi ditolak' : err.message;
+        err.code === 1 ? 'Izin lokasi ditolak — ketuk ⟳ untuk coba lagi' : err.message;
+      isLocating = false;
     },
-    { enableHighAccuracy: true, timeout: 10000, maximumAge: 30000 }
+    { enableHighAccuracy: true, timeout: 15000, maximumAge: 10000 }
   );
 }
 
@@ -412,11 +444,7 @@ function getLocation() {
 function checkReady() {
   const teacher = document.getElementById('teacherSelect').value;
   const btn = document.getElementById('btnSubmit');
-  if (teacher && capturedPhotoData && currentPosition) {
-    btn.disabled = false;
-  } else {
-    btn.disabled = true;
-  }
+  btn.disabled = !(teacher && capturedPhotoData && currentPosition);
 }
 
 // ====== SUBMIT ======
@@ -451,24 +479,24 @@ async function submitPresensi() {
 
     if (res.ok) {
       showToast('✅ Presensi berhasil dicatat!', 'success');
-      // Reset form
       setTimeout(() => {
         document.getElementById('teacherSelect').value = '';
         document.getElementById('searchInput').value = '';
         filterTeachers();
         retakePhoto();
+        refreshLocation();
       }, 1500);
     } else {
       const err = await res.json().catch(() => ({}));
       showToast('❌ Gagal: ' + (err.message || err.error || 'Unknown error'), 'error');
     }
   } catch (err) {
-    showToast('❌ Error: ' + err.message, 'error');
+    showToast('❌ Koneksi error: ' + err.message, 'error');
   } finally {
     isSubmitting = false;
     btn.textContent = 'KIRIM';
     btn.classList.remove('sending');
-    btn.disabled = true; // re-check via checkReady after reset
+    btn.disabled = true;
   }
 }
 
