@@ -1,7 +1,8 @@
 {
-  "name": "absengurusmpabbs",
   "framework": null,
   "rewrites": [
-    { "source": "/presensi", "destination": "/presensi.html" }
+    { "source": "/", "destination": "/presensi.html" },
+    { "source": "/presensi", "destination": "/presensi.html" },
+    { "source": "/rekap", "destination": "/rekap.html" }
   ]
 }

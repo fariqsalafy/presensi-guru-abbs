@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
+<title>Rekap Presensi — SMP ABBS Surakarta</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background: #0f172a; color: #e2e8f0; min-height: 100vh;
+}
+/* HEADER */
+.header {
+  background: linear-gradient(135deg,#1e293b 0%,#0f172a 100%);
+  padding: 18px 16px 14px; text-align: center;
+  border-bottom: 1px solid #1e293b; position: sticky; top: 0; z-index: 50;
+}
+.header h1 { font-size: 20px; font-weight: 800; letter-spacing: 2px; color: #fbbf24; }
+.header .sub { font-size: 11px; color: #94a3b8; margin-top: 2px; letter-spacing: 1px; }
+.header .range { font-size: 12px; color: #38bdf8; margin-top: 4px; }
+/* WRAPPER */
+.wrap { max-width: 100%; overflow-x: auto; padding: 12px; }
+table {
+  width: 100%; border-collapse: separate; border-spacing: 0;
+  font-size: 12px; min-width: max-content;
+  border: 1px solid #1e293b; border-radius: 12px; overflow: hidden;
+}
+thead { position: sticky; top: 80px; z-index: 40; }
+th {
+  background: #1e293b; color: #94a3b8; font-weight: 700;
+  padding: 8px 6px; text-align: center; white-space: nowrap;
+  border-bottom: 1px solid #334155;
+  font-size: 11px; letter-spacing: 0.5px;
+}
+th.sticky-name { position: sticky; left: 0; z-index: 42; background: #1e293b; min-width: 160px; text-align: left; padding-left: 10px; }
+td {
+  padding: 6px; text-align: center; border-bottom: 1px solid #1e293b;
+  vertical-align: middle;
+}
+tr:last-child td { border-bottom: none; }
+tr:hover td { background: #1e293b88; }
+td.sticky-name { position: sticky; left: 0; z-index: 1; background: #0f172a; text-align: left; padding-left: 10px; font-weight: 600; color: #f1f5f9; }
+tr:hover td.sticky-name { background: #1e293b; }
+/* DATE CELLS */
+td.present { color: #4ade80; cursor: pointer; font-size: 14px; }
+td.present:hover { background: #16653455; border-radius: 4px; }
+td.absent { color: #334155; font-size: 12px; }
+/* TOT & HADIR */
+td.stat { font-weight: 700; font-size: 13px; }
+td.tot { color: #facc15; }
+td.hadir { color: #4ade80; }
+/* NO COL */
+td.no { color: #64748b; font-size: 11px; }
+/* LOADING */
+.loading-wrap { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 60px 20px; gap: 16px; }
+.spinner { width: 36px; height: 36px; border: 3px solid #1e293b; border-top-color: #fbbf24; border-radius: 50%; animation: spin .8s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+.loading-wrap p { color: #94a3b8; font-size: 14px; }
+/* MODAL */
+.modal-overlay {
+  position: fixed; inset: 0; background: rgba(0,0,0,0.75);
+  display: none; align-items: center; justify-content: center;
+  z-index: 999; padding: 20px;
+}
+.modal-overlay.show { display: flex; }
+.modal-box {
+  background: #1e293b; border-radius: 16px; padding: 20px;
+  max-width: 440px; width: 100%; max-height: 90vh; overflow-y: auto;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.6); text-align: center;
+}
+.modal-box h3 { font-size: 16px; color: #f1f5f9; margin-bottom: 4px; }
+.modal-box .modal-date { font-size: 12px; color: #94a3b8; margin-bottom: 12px; }
+.modal-box .modal-coords { font-size: 11px; color: #64748b; margin-top: 8px; word-break: break-all; }
+.modal-box img { max-width: 100%; border-radius: 12px; margin-top: 8px; }
+.modal-close {
+  display: inline-block; margin-top: 14px; padding: 8px 24px;
+  background: #334155; color: #e2e8f0; border: none; border-radius: 10px;
+  font-size: 13px; font-weight: 600; cursor: pointer;
+}
+.modal-close:hover { background: #475569; }
+/* NO DATA */
+.empty { text-align: center; padding: 40px 20px; color: #64748b; font-size: 14px; }
+/* REFRESH */
+.refresh-bar { display: flex; justify-content: flex-end; padding: 8px 16px 0; gap: 8px; }
+.refresh-btn {
+  padding: 6px 14px; background: #1e293b; color: #94a3b8;
+  border: none; border-radius: 8px; font-size: 12px; cursor: pointer;
+}
+.refresh-btn:hover { background: #334155; color: #f1f5f9; }
+/* MOBILE */
+@media(max-width:640px){
+  .header h1 { font-size: 17px; }
+  th { font-size: 10px; padding: 6px 4px; }
+  th.sticky-name { min-width: 120px; font-size: 10px; }
+  td { padding: 4px; font-size: 11px; }
+  td.sticky-name { min-width: 120px; font-size: 12px; }
+  td.present { font-size: 12px; }
+}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>REKAP PRESENSI</h1>
+  <div class="sub">SMP ABBS Surakarta</div>
+  <div class="range" id="rangeLabel">Memuat...</div>
+</div>
+
+<div class="refresh-bar">
+  <button class="refresh-btn" onclick="loadData()">🔄 Muat ulang</button>
+</div>
+
+<div id="contentWrap"><div class="loading-wrap"><div class="spinner"></div><p>Memuat data rekap...</p></div></div>
+
+<!-- MODAL -->
+<div class="modal-overlay" id="modalOverlay" onclick="closeModal(event)">
+  <div class="modal-box" id="modalBox">
+    <h3 id="modalName"></h3>
+    <div class="modal-date" id="modalDate"></div>
+    <img id="modalImg" src="" alt="Foto">
+    <div class="modal-coords" id="modalCoords"></div>
+    <button class="modal-close" onclick="closeModal()">Tutup</button>
+  </div>
+</div>
+
+<script>
+// ====== CONFIG ======
+const SUPABASE_URL = 'https://xyypuwjpmbkxxlladqtp.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_88Zpk6jMbR8yf4k56_AHtw_ersLMAq6';
+const TABLE = 'presensi_guru';
+
+const TEACHERS = [
+  "Muamar Fariq Salafy","Asnia Novitasari","Hari Rohmah","Wafda Salsabila",
+  "Siti Robiatul Adawiyah","Adila Rahmah","Scundy Nourma Pratiwi","Binti Qoeroti",
+  "Ramadanti Prativi","Fitri Nur Kolifah","Fatma Roudhotul Rafida Kolis",
+  "Joko Ariyanto","Musfiq Amrulloh","Febri Cahya Syahputra","Aulia Qisthi Rosyada",
+  "Ifan Destya Adi Tama","Charlieta Nova Putri Fedito","Siti Khoimah",
+  "Danang Dwi Pambudi","Yona Puspa Ningtias","Sharih Shadri","Farida Nur Hidayati",
+  "Hang Sakti Abdullah","Syarah Karina Putri","Isti Qomah Nurul Izzati",
+  "Iin Indah Saputri","Daffa Danendra Rizqi Nugraha","Arvino Nurvieri Kusuma",
+  "Siti Sirril Inayah","Ida Aryani S","Muhammad Fahmi Aziz","Ahmad Bayu Abdullah",
+  "Siti Zamrotun Rizqiah","Syahrul Abdi Narotama","Andi wijayanto",
+  "Muhammad Syafiq","Amien Nur Wicaksono","Yoki Wirawan","Fadlan Rifai AL-Irsyad",
+  "Nur Rohmah Hidayanti"
+];
+
+// ====== DATE HELPERS ======
+function getDateRange() {
+  const now = new Date();
+  const start = new Date(now);
+  start.setDate(now.getDate() + 1); // besok
+  const end = new Date(now.getFullYear(), now.getMonth() + 1, 20); // 20 bulan depan
+  const dates = [];
+  const d = new Date(start);
+  while (d <= end) {
+    dates.push(d.toISOString().slice(0,10));
+    d.setDate(d.getDate() + 1);
+  }
+  return dates;
+}
+
+function fmtDate(iso) {
+  const d = new Date(iso + 'T00:00:00');
+  const days = ['Min','Sen','Sel','Rab','Kam','Jum','Sab'];
+  return days[d.getDay()] + ' ' + d.getDate();
+}
+
+function fmtDateFull(iso) {
+  const months = ['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des'];
+  const d = new Date(iso + 'T00:00:00');
+  return d.getDate() + ' ' + months[d.getMonth()] + ' ' + d.getFullYear();
+}
+
+// ====== STATE ======
+let cachedRecords = [];
+
+// ====== MAIN ======
+async function loadData() {
+  const wrap = document.getElementById('contentWrap');
+  wrap.innerHTML = '<div class="loading-wrap"><div class="spinner"></div><p>Memuat data rekap...</p></div>';
+
+  const dates = getDateRange();
+  document.getElementById('rangeLabel').textContent =
+    fmtDateFull(dates[0]) + ' — ' + fmtDateFull(dates[dates.length-1]);
+
+  try {
+    // Fetch all presensi records (metadata only, no photo_data)
+    const url = SUPABASE_URL + '/rest/v1/' + TABLE +
+      '?select=id,teacher_name,tgl,created_at,latitude,longitude,location_accuracy' +
+      '&tgl=gte.' + dates[0] + '&tgl=lte.' + dates[dates.length-1] +
+      '&order=tgl.asc';
+    const res = await fetch(url, {
+      headers: { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY }
+    });
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+
+    const rows = await res.json();
+    cachedRecords = rows || [];
+
+    // Build lookup: teacher_name + tgl -> record
+    const lookup = {};
+    for (const r of cachedRecords) {
+      const key = r.teacher_name + '|' + r.tgl;
+      lookup[key] = r;
+    }
+
+    // Calculate ToT and total per teacher
+    // ToT = count of presensi where time < 06:51 WIB (created_at is UTC, convert to WIB=UTC+7)
+    const totCount = {};   // teacher_name -> count of ToT
+    const hadirCount = {}; // teacher_name -> total hadir in range
+    for (const r of cachedRecords) {
+      hadirCount[r.teacher_name] = (hadirCount[r.teacher_name] || 0) + 1;
+      const d = new Date(r.created_at);
+      const h = (d.getUTCHours() + 7) % 24;
+      const m = d.getUTCMinutes();
+      if (h < 6 || (h === 6 && m < 51)) {
+        totCount[r.teacher_name] = (totCount[r.teacher_name] || 0) + 1;
+      }
+    }
+
+    // Build table
+    let html = '<div class="wrap"><table><thead><tr>';
+    html += '<th class="sticky-name">Nama Guru</th>';
+    for (const d of dates) {
+      html += '<th>' + fmtDate(d) + '</th>';
+    }
+    html += '<th class="tot">TOT</th>';
+    html += '<th class="hadir">Hadir</th>';
+    html += '</tr></thead><tbody>';
+
+    for (const teacher of TEACHERS) {
+      html += '<tr>';
+      html += '<td class="sticky-name">' + teacher + '</td>';
+      for (const d of dates) {
+        const key = teacher + '|' + d;
+        const rec = lookup[key];
+        if (rec) {
+          html += '<td class="present" onclick="openModal(\'' + rec.id + '\')">✅</td>';
+        } else {
+          const dObj = new Date(d + 'T00:00:00');
+          const today = new Date();
+          today.setHours(0,0,0,0);
+          if (dObj < today) {
+            html += '<td class="absent">—</td>';
+          } else {
+            html += '<td class="absent">·</td>';
+          }
+        }
+      }
+      html += '<td class="stat tot">' + (totCount[teacher] || 0) + '</td>';
+      html += '<td class="stat hadir">' + (hadirCount[teacher] || 0) + '</td>';
+      html += '</tr>';
+    }
+
+    html += '</tbody></table></div>';
+    wrap.innerHTML = html;
+
+  } catch (err) {
+    wrap.innerHTML = '<div class="empty">❌ Gagal memuat data: ' + err.message + '</div>';
+  }
+}
+
+// ====== MODAL ======
+async function openModal(recordId) {
+  const overlay = document.getElementById('modalOverlay');
+  const nameEl = document.getElementById('modalName');
+  const dateEl = document.getElementById('modalDate');
+  const imgEl = document.getElementById('modalImg');
+  const coordsEl = document.getElementById('modalCoords');
+
+  nameEl.textContent = 'Memuat...';
+  dateEl.textContent = '';
+  imgEl.src = '';
+  coordsEl.textContent = '';
+  overlay.classList.add('show');
+
+  try {
+    const res = await fetch(SUPABASE_URL + '/rest/v1/' + TABLE + '?id=eq.' + recordId + '&select=*', {
+      headers: { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY }
+    });
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const data = await res.json();
+    if (!data || !data.length) throw new Error('Data tidak ditemukan');
+
+    const rec = data[0];
+    nameEl.textContent = rec.teacher_name;
+    const d = new Date(rec.created_at);
+    const wibH = (d.getUTCHours() + 7) % 24;
+    const wibM = d.getUTCMinutes();
+    const wibTime = String(wibH).padStart(2,'0') + ':' + String(wibM).padStart(2,'0') + ' WIB';
+    dateEl.textContent = fmtDateFull(rec.tgl) + ' · ' + wibTime;
+    imgEl.src = rec.photo_data;
+    if (rec.latitude && rec.longitude) {
+      coordsEl.textContent = rec.latitude.toFixed(5) + ', ' + rec.longitude.toFixed(5) +
+        (rec.location_accuracy ? ' ±' + rec.location_accuracy.toFixed(0) + 'm' : '');
+    }
+  } catch (err) {
+    nameEl.textContent = 'Error';
+    dateEl.textContent = err.message;
+    imgEl.src = '';
+  }
+}
+
+function closeModal(ev) {
+  if (ev && ev.target !== document.getElementById('modalOverlay')) return;
+  document.getElementById('modalOverlay').classList.remove('show');
+}
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') document.getElementById('modalOverlay').classList.remove('show');
+});
+// Click outside modal content to close
+document.getElementById('modalOverlay').addEventListener('click', function(ev) {
+  if (ev.target === this) this.classList.remove('show');
+});
+
+// ====== INIT ======
+document.addEventListener('DOMContentLoaded', loadData);
+</script>
+</body>
+</html>
