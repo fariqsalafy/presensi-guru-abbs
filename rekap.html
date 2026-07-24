@@ -9,66 +9,139 @@
 * { margin: 0; padding: 0; box-sizing: border-box; }
 body {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  background: #0f172a; color: #e2e8f0; min-height: 100vh;
+  background: #0a0f1a; color: #e2e8f0; min-height: 100vh;
 }
-/* TITLE BAR */
-.title-bar {
-  background: linear-gradient(135deg,#1e293b 0%,#0f172a 100%);
-  padding: 14px 16px 10px; text-align: center;
-  border-bottom: 1px solid #1e293b;
+/* ===== TOP BAR (Dashboard C) ===== */
+.top-bar {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 12px 16px; background: #0a0f1a; border-bottom: 1px solid #1e293b;
+  position: sticky; top: 0; z-index: 50;
 }
-.title-bar h1 { font-size: 18px; font-weight: 800; color: #fbbf24; letter-spacing: 2px; }
-.title-bar .sub { font-size: 11px; color: #94a3b8; letter-spacing: 1px; margin-top: 1px; }
-/* WRAP */
-.wrap { max-width: 100%; overflow-x: auto; }
+.top-bar .logo { font-size: 16px; font-weight: 800; color: #fbbf24; letter-spacing: 1px; }
+.top-bar .icons { display: flex; gap: 12px; color: #64748b; font-size: 18px; }
+.top-bar .icons span { cursor: pointer; }
+/* ===== METRICS ===== */
+.metrics {
+  display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1px;
+  background: #1e293b;
+}
+.metric { background: #0f172a; padding: 18px 12px; text-align: center; position: relative; overflow: hidden; }
+.metric::after { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; }
+.metric.gold::after { background: #fbbf24; }
+.metric.green::after { background: #4ade80; }
+.metric.blue::after { background: #38bdf8; }
+.metric .value { font-size: 26px; font-weight: 800; letter-spacing: -0.5px; }
+.metric.gold .value { color: #fbbf24; }
+.metric.green .value { color: #4ade80; }
+.metric.blue .value { color: #38bdf8; }
+.metric .lbl { font-size: 9px; text-transform: uppercase; letter-spacing: 1.5px; color: #64748b; margin-top: 4px; }
+.metric .sub { font-size: 10px; color: #475569; margin-top: 1px; }
+/* ===== SEARCH + ACTIONS ===== */
+.c-actions {
+  display: flex; gap: 8px; padding: 10px 16px;
+  border-bottom: 1px solid #1e293b; align-items: center;
+}
+.c-search-wrap { flex: 1; position: relative; }
+.c-search-wrap input {
+  width: 100%; padding: 8px 14px 8px 32px; border-radius: 10px;
+  border: 1px solid #334155; background: #0b1120; color: #e2e8f0;
+  font-size: 13px; outline: none;
+}
+.c-search-wrap input::placeholder { color: #475569; }
+.c-search-wrap input:focus { border-color: #fbbf24; }
+.c-search-icon { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); color: #475569; font-size: 14px; pointer-events: none; }
+.c-actions button {
+  flex-shrink: 0; padding: 8px 12px; border-radius: 10px; border: none;
+  font-weight: 700; font-size: 11px; cursor: pointer; display: inline-flex;
+  align-items: center; gap: 5px;
+}
+.c-actions .btn-ex { background: #fbbf24; color: #0f172a; }
+.c-actions .btn-ex:hover { background: #f59e0b; }
+.c-actions .btn-ghost { background: #1e293b; color: #e2e8f0; border: 1px solid #334155; }
+.c-actions .btn-ghost:hover { background: #334155; }
+/* ===== PILLS ===== */
+.pills { display: flex; gap: 6px; padding: 8px 16px; border-bottom: 1px solid #1e293b; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+.pill {
+  flex-shrink: 0; padding: 5px 12px; border-radius: 20px; font-size: 11px;
+  font-weight: 600; cursor: pointer; border: 1px solid #334155;
+  background: transparent; color: #64748b; white-space: nowrap;
+  transition: all .15s;
+}
+.pill.active { background: #fbbf24; color: #0f172a; border-color: #fbbf24; }
+.pill:hover { border-color: #64748b; color: #e2e8f0; }
+/* ===== TABLE ===== */
+.table-wrap { overflow-x: auto; }
 table {
   width: 100%; border-collapse: separate; border-spacing: 0;
   font-size: 12px; min-width: max-content;
-  border: none; border-radius: 0;
 }
 thead { position: sticky; top: 0; z-index: 40; }
 th {
-  background: #0f172a; color: #94a3b8; font-weight: 700;
+  background: #0f172a; color: #475569; font-weight: 700;
   padding: 10px 4px; text-align: center; white-space: nowrap;
   border-bottom: 1px solid #1e293b;
-  font-size: 10px; letter-spacing: 0.3px;
+  font-size: 9px; text-transform: uppercase; letter-spacing: 1px;
 }
-th.sticky-name { position: sticky; left: 0; z-index: 42; background: #0f172a; min-width: 155px; text-align: left; padding-left: 10px; }
-th .range-label { color: #38bdf8; font-weight: 400; font-size: 8px; display: block; letter-spacing: 0; margin-top: 1px; }
+th.sticky-name { position: sticky; left: 0; z-index: 42; background: #0f172a; min-width: 155px; text-align: left; padding-left: 16px; }
+th .range-label { color: #38bdf8; font-weight: 400; font-size: 8px; display: block; letter-spacing: 0; margin-top: 1px; text-transform: none; }
 td {
-  padding: 5px 3px; text-align: center; border-bottom: 1px solid #1e293b;
+  padding: 6px 3px; text-align: center; border-bottom: 1px solid rgba(30,41,59,0.4);
   vertical-align: middle;
 }
 tr:last-child td { border-bottom: none; }
-tr:hover td { background: #1e293b88; }
-td.sticky-name { position: sticky; left: 0; z-index: 1; background: #0f172a; text-align: left; padding-left: 10px; font-weight: 600; color: #f1f5f9; font-size: 12px; }
+tr:hover td { background: rgba(30,41,59,0.4); }
+td.sticky-name {
+  position: sticky; left: 0; z-index: 1; background: #0f172a;
+  text-align: left; padding-left: 16px; font-weight: 600;
+  color: #f1f5f9; font-size: 12px;
+}
 tr:hover td.sticky-name { background: #1e293b; }
-/* TIME CELLS */
-td.time { font-family: 'SF Mono','Menlo','Fira Code',monospace; font-size: 11px; font-weight: 600; cursor: pointer; padding: 5px 3px; min-width: 38px; }
+/* TIME */
+td.time { font-family: 'SF Mono','Menlo','Fira Code',monospace; font-size: 11px; font-weight: 600; cursor: pointer; padding: 5px 3px; min-width: 36px; }
 td.time-ontime { color: #4ade80; }
 td.time-ontime:hover { background: #16653455; border-radius: 3px; }
 td.time-late { color: #fbbf24; }
 td.time-late:hover { background: #78350f55; border-radius: 3px; }
-td.absent { color: #334155; font-size: 11px; }
-td.absent-future { color: #1e293b; font-size: 11px; }
-/* TOT & HADIR */
+td.absent { color: #1e293b; font-size: 11px; }
+td.absent-future { color: #0b1120; font-size: 11px; }
 td.stat { font-weight: 700; font-size: 12px; padding: 5px 8px; }
 td.tot { color: #facc15; }
 td.hadir { color: #4ade80; }
+/* LEGEND */
+.legend {
+  display: flex; gap: 16px; padding: 8px 16px 12px;
+  font-size: 10px; color: #475569; border-bottom: 1px solid #1e293b;
+}
+.legend span { display: flex; align-items: center; gap: 4px; }
+.legend .dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
+.legend .dot-green { background: #4ade80; }
+.legend .dot-gold { background: #fbbf24; }
+.legend .dot-gray { background: #1e293b; }
+/* FOOTER */
+.foot-bar {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 12px 16px; border-top: 1px solid #1e293b;
+  font-size: 11px; color: #475569;
+}
+.foot-bar button {
+  width: 36px; height: 36px; border-radius: 50%; background: #1e293b;
+  border: 1px solid #334155; color: #fbbf24; cursor: pointer; font-size: 16px;
+  display: flex; align-items: center; justify-content: center;
+}
+.foot-bar button:hover { background: #334155; }
 /* LOADING */
 .loading-wrap { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 60px 20px; gap: 16px; }
 .spinner { width: 36px; height: 36px; border: 3px solid #1e293b; border-top-color: #fbbf24; border-radius: 50%; animation: spin .8s linear infinite; }
 @keyframes spin { to { transform: rotate(360deg); } }
 .loading-wrap p { color: #94a3b8; font-size: 14px; }
-/* REFRESH */
-.float-refresh {
-  position: fixed; bottom: 20px; right: 20px; z-index: 99;
-  width: 44px; height: 44px; border-radius: 50%;
-  background: #1e293b; color: #fbbf24; border: 1px solid #334155;
-  font-size: 20px; cursor: pointer; box-shadow: 0 4px 20px rgba(0,0,0,0.5);
-  display: flex; align-items: center; justify-content: center;
+/* PERIOD BADGE */
+.period-badge {
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+  padding: 6px 16px; border-bottom: 1px solid #1e293b;
+  font-size: 11px; color: #64748b;
 }
-.float-refresh:hover { background: #334155; }
+.period-badge strong { color: #38bdf8; font-weight: 700; }
+.period-badge .sep { color: #334155; }
 /* MODAL */
 .modal-overlay {
   position: fixed; inset: 0; background: rgba(0,0,0,0.75);
@@ -77,15 +150,15 @@ td.hadir { color: #4ade80; }
 }
 .modal-overlay.show { display: flex; }
 .modal-box {
-  background: #1e293b; border-radius: 16px; padding: 20px;
+  background: #0f172a; border-radius: 16px; padding: 20px;
   max-width: 440px; width: 100%; max-height: 90vh; overflow-y: auto;
   box-shadow: 0 20px 60px rgba(0,0,0,0.6); text-align: center;
+  border: 1px solid #1e293b;
 }
 .modal-box h3 { font-size: 16px; color: #f1f5f9; margin-bottom: 4px; }
 .modal-box .modal-date { font-size: 12px; color: #94a3b8; margin-bottom: 12px; }
 .modal-box .modal-coords { font-size: 11px; color: #64748b; margin-top: 8px; word-break: break-all; }
 .modal-box img { max-width: 100%; border-radius: 12px; margin-top: 8px; }
-/* MODAL ACTIONS */
 .modal-actions {
   display: flex; gap: 8px; justify-content: center; flex-wrap: wrap;
   margin-top: 16px; border-top: 1px solid #1e293b; padding-top: 14px;
@@ -94,70 +167,80 @@ td.hadir { color: #4ade80; }
   display: inline-flex; align-items: center; gap: 5px;
   padding: 9px 18px; border-radius: 10px; font-size: 12px;
   font-weight: 700; cursor: pointer; border: none; letter-spacing: 0.3px;
-  transition: background .15s;
+  transition: all .15s;
 }
-.modal-btn-close  { background: #334155; color: #e2e8f0; }
-.modal-btn-close:hover { background: #475569; }
+.modal-btn-close  { background: #1e293b; color: #e2e8f0; }
+.modal-btn-close:hover { background: #334155; }
 .modal-btn-edit   { background: #1e3a5f; color: #60a5fa; border: 1px solid #1e40af; }
 .modal-btn-edit:hover  { background: #1e40af; }
 .modal-btn-danger { background: #7f1d1d; color: #fca5a5; border: 1px solid #991b1b; }
 .modal-btn-danger:hover { background: #991b1b; }
-/* EDIT FORM */
-.modal-edit-form {
-  display: none; margin-top: 12px; text-align: left;
-}
+.modal-edit-form { display: none; margin-top: 12px; text-align: left; }
 .modal-edit-form.show { display: block; }
-.modal-edit-form label {
-  display: block; font-size: 11px; color: #94a3b8; margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.5px;
-}
+.modal-edit-form label { display: block; font-size: 11px; color: #94a3b8; margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.5px; }
 .modal-edit-form input {
-  width: 100%; padding: 10px 12px; background: #0f172a; border: 1px solid #334155;
+  width: 100%; padding: 10px 12px; background: #0b1120; border: 1px solid #334155;
   border-radius: 8px; color: #e2e8f0; font-size: 14px; font-family: 'SF Mono','Menlo',monospace;
   margin-bottom: 12px; outline: none;
 }
 .modal-edit-form input:focus { border-color: #60a5fa; }
-.modal-edit-form .edit-actions {
-  display: flex; gap: 8px; justify-content: flex-end;
-}
-/* BUTTON BAR */
-.btn-bar {
-  display: flex; gap: 8px; justify-content: center; padding: 10px 16px;
-  background: #0f172a; border-bottom: 1px solid #1e293b; flex-wrap: wrap;
-}
-.btn-bar button {
-  padding: 8px 18px; border: 1px solid #334155; border-radius: 10px;
-  font-size: 12px; font-weight: 700; cursor: pointer; display: inline-flex;
-  align-items: center; gap: 6px; letter-spacing: 0.3px;
-}
-.btn-export {
-  background: #1e293b; color: #38bdf8;
-}
-.btn-export:hover { background: #334155; }
-/* NO DATA */
+.modal-edit-form .edit-actions { display: flex; gap: 8px; justify-content: flex-end; }
+/* EMPTY */
 .empty { text-align: center; padding: 40px 20px; color: #64748b; font-size: 14px; }
-/* MOBILE */
+/* RESPONSIVE */
 @media(max-width:640px){
-  .title-bar h1 { font-size: 15px; }
-  th { font-size: 9px; padding: 8px 2px; }
-  th.sticky-name { min-width: 110px; font-size: 9px; }
+  .top-bar { padding: 10px 12px; }
+  .top-bar .logo { font-size: 14px; }
+  .metric { padding: 14px 8px; }
+  .metric .value { font-size: 22px; }
+  th { font-size: 8px; padding: 8px 2px; }
+  th.sticky-name { min-width: 110px; font-size: 8px; }
   td { padding: 4px 2px; font-size: 10px; }
   td.sticky-name { min-width: 110px; font-size: 11px; }
-  td.time { font-size: 10px; min-width: 32px; }
+  td.time { font-size: 10px; min-width: 30px; }
+  .c-actions { flex-wrap: wrap; }
+  .c-actions button { font-size: 10px; padding: 6px 10px; }
 }
 </style>
 </head>
 <body>
 
-<div class="title-bar">
-  <h1>REKAP PRESENSI</h1>
-  <div class="sub">SMP ABBS Surakarta</div>
+<div class="top-bar">
+  <div class="logo">PRESENSI</div>
+  <div class="icons"><span title="Info">ℹ</span><span title="Atur">⚙</span></div>
 </div>
 
-<div class="btn-bar">
-  <button class="btn-export" onclick="exportExcel()">⎙ Export Excel</button>
+<div class="metrics" id="metricsRow">
+  <div class="metric gold"><div class="value" id="mTot">—</div><div class="lbl">Tepat Waktu</div><div class="sub" id="mTotSub"></div></div>
+  <div class="metric green"><div class="value" id="mHadir">—</div><div class="lbl">Total Hadir</div><div class="sub" id="mHadirSub"></div></div>
+  <div class="metric blue"><div class="value" id="mPct">—</div><div class="lbl">Kehadiran</div><div class="sub" id="mPctSub"></div></div>
+</div>
+
+<div class="c-actions">
+  <div class="c-search-wrap">
+    <span class="c-search-icon">🔍</span>
+    <input id="searchInput" type="text" placeholder="Cari guru..." oninput="filterTable()">
+  </div>
+  <button class="btn-ex" onclick="exportExcel()">⎙ Excel</button>
+  <button class="btn-ghost" onclick="loadData()">⟳</button>
+</div>
+
+<div class="period-badge" id="periodBadge"></div>
+
+<div class="pills" id="pillsWrap"></div>
+
+<div class="legend">
+  <span><span class="dot dot-green"></span> Tepat</span>
+  <span><span class="dot dot-gold"></span> Terlambat</span>
+  <span><span class="dot dot-gray"></span> Absen</span>
 </div>
 
 <div id="contentWrap"><div class="loading-wrap"><div class="spinner"></div><p>Memuat data rekap...</p></div></div>
+
+<div class="foot-bar">
+  <span id="footInfo">Memuat...</span>
+  <button onclick="loadData()" title="Refresh">↻</button>
+</div>
 
 <!-- MODAL -->
 <div class="modal-overlay" id="modalOverlay" onclick="closeModal(event)">
@@ -166,8 +249,6 @@ td.hadir { color: #4ade80; }
     <div class="modal-date" id="modalDate"></div>
     <img id="modalImg" src="" alt="Foto">
     <div class="modal-coords" id="modalCoords"></div>
-
-    <!-- VIEW MODE -->
     <div id="modalView">
       <div class="modal-actions">
         <button class="modal-btn modal-btn-close" onclick="closeModal()">✕ Tutup</button>
@@ -175,8 +256,6 @@ td.hadir { color: #4ade80; }
         <button class="modal-btn modal-btn-danger" onclick="deleteRecord()">🗑 Hapus</button>
       </div>
     </div>
-
-    <!-- EDIT MODE -->
     <div class="modal-edit-form" id="modalEditForm">
       <label>Jam Presensi (HH:mm)</label>
       <input type="time" id="editTimeInput">
@@ -193,7 +272,6 @@ td.hadir { color: #4ade80; }
 const SUPABASE_URL = 'https://xyypuwjpmbkxxlladqtp.supabase.co';
 const SUPABASE_KEY = 'sb_publishable_88Zpk6jMbR8yf4k56_AHtw_ersLMAq6';
 const TABLE = 'presensi_guru';
-
 const TEACHERS = [
   "Adila Rahmah","Amien Nur Wicaksono","Andi Wijayanto","Arfian Moneter Pratama",
   "Arif Hidayat","Arvino Nurvieri Kusuma","Asnia Novitasari",
@@ -212,399 +290,294 @@ const TEACHERS = [
   "Wafda Salsabila","Yoki Wirawan","Yona Puspa Ningtias"
 ];
 
-// ====== DATE HELPERS ======
-function getDateRange() {
-  const now = new Date();
-  const curY = now.getFullYear();
-  const curM = now.getMonth();
-  let startM = curM, startY = curY;
-  if (now.getDate() < 21) {
-    startM = curM - 1;
-    if (startM < 0) { startM = 11; startY--; }
-  }
-  const endM = startM + 1;
-  const endY = startY + (endM > 11 ? 1 : 0);
-  const start = new Date(startY, startM, 21);
-  const end = new Date(endY, endM % 12, 20);
-  const dates = [];
-  const d = new Date(start);
-  while (d <= end) {
-    dates.push(d.toISOString().slice(0,10));
-    d.setDate(d.getDate() + 1);
-  }
-  return dates;
-}
-
-function fmtDate(iso) {
-  const d = new Date(iso + 'T00:00:00');
-  const months = ['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des'];
-  return d.getDate() + ' ' + months[d.getMonth()];
-}
-
-function fmtDateFull(iso) {
-  const months = ['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des'];
-  const d = new Date(iso + 'T00:00:00');
-  return d.getDate() + ' ' + months[d.getMonth()] + ' ' + d.getFullYear();
-}
-
-// ====== WIB TIME FROM ISO ======
-function wibTime(iso) {
-  const d = new Date(iso);
-  const h = (d.getUTCHours() + 7) % 24;
-  const m = d.getUTCMinutes();
-  return { h, m, str: String(h).padStart(2,'0') + ':' + String(m).padStart(2,'0') };
-}
-
 // ====== STATE ======
-let cachedRecords = [];
-let modalRecordId = null;
-let modalRecord = null;
+let rawRecords = [];            // all records from DB
+let currentEditId = null;       // id of record being edited
+const TIME_LIMIT = '07:00';     // batas terlambat
 
-// ====== MAIN ======
+// ====== PERIOD 21 → 20 ======
+function getPeriod(d) {
+  d = d || new Date();
+  const day = d.getDate();
+  const y = d.getFullYear(), m = d.getMonth();
+  let start, end;
+  if (day >= 21) {
+    start = new Date(y, m, 21);
+    end = new Date(y, m + 1, 20);
+  } else {
+    start = new Date(y, m - 1, 21);
+    end = new Date(y, m, 20);
+  }
+  return { start, end };
+}
+function periodKey(d) {
+  const p = getPeriod(d);
+  return p.start.toISOString().slice(0,10) + '_' + p.end.toISOString().slice(0,10);
+}
+function periodLabel(p) {
+  const mos = ['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des'];
+  return `${p.start.getDate()} ${mos[p.start.getMonth()]} ${p.start.getFullYear()} <span class="sep">—</span> ${p.end.getDate()} ${mos[p.end.getMonth()]} ${p.end.getFullYear()}`;
+}
+function dateInPeriod(d, p) {
+  const ts = new Date(d + 'T00:00:00').getTime();
+  return ts >= p.start.getTime() && ts <= p.end.getTime();
+}
+
+// ====== DATE HELPERS ======
+function formatDate(id) {
+  const d = new Date(id + 'T00:00:00');
+  const days = ['Min','Sen','Sel','Rab','Kam','Jum','Sab'];
+  const months = ['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des'];
+  return days[d.getDay()] + ', ' + d.getDate() + ' ' + months[d.getMonth()];
+}
+
+// ====== BUILD PILLS ======
+function buildPills() {
+  const period = getPeriod();
+  document.getElementById('periodBadge').innerHTML = '📅 Periode: <strong>' + periodLabel(period) + '</strong>';
+  if (rawRecords.length === 0) { document.getElementById('pillsWrap').innerHTML = ''; return; }
+  // Filter only dates within period
+  let periodDates = [...new Set(rawRecords.map(r => r.tgl))].filter(d => dateInPeriod(d, period)).sort();
+  if (periodDates.length === 0) { document.getElementById('pillsWrap').innerHTML = ''; return; }
+  let activeDate = periodDates[periodDates.length - 1];
+  const saved = sessionStorage.getItem('rekap_pill');
+  if (saved && periodDates.includes(saved)) activeDate = saved;
+  const wrap = document.getElementById('pillsWrap');
+  wrap.innerHTML = '';
+  // Week grouping
+  let weeks = [];
+  let cur = [];
+  periodDates.forEach((d,i) => {
+    const dt = new Date(d + 'T00:00:00');
+    const day = dt.getDay();
+    cur.push(d);
+    if (day === 6 || i === periodDates.length - 1) { weeks.push(cur); cur = []; }
+  });
+  weeks.forEach(w => {
+    const start = new Date(w[0] + 'T00:00:00');
+    const end = new Date(w[w.length-1] + 'T00:00:00');
+    const label = `${start.getDate()} ${['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des'][start.getMonth()]}`;
+    const labelEnd = end.getDate() !== start.getDate() ? ` – ${end.getDate()} ${['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des'][end.getMonth()]}` : '';
+    const pill = document.createElement('span');
+    pill.className = 'pill' + (w.includes(activeDate) ? ' active' : '');
+    pill.textContent = label + labelEnd;
+    pill.dataset.dates = JSON.stringify(w);
+    pill.onclick = function() {
+      document.querySelectorAll('.pill').forEach(p => p.classList.remove('active'));
+      this.classList.add('active');
+      sessionStorage.setItem('rekap_pill', w[w.length-1]);
+      renderTable(JSON.parse(this.dataset.dates));
+    };
+    wrap.appendChild(pill);
+  });
+}
+
+// ====== RENDER TABLE ======
+function renderTable(dates) {
+  const wrap = document.getElementById('contentWrap');
+  if (!dates || dates.length === 0) { wrap.innerHTML = '<div class="empty">Tidak ada data</div>'; return; }
+  const dateSet = new Set(dates);
+  // Filter records within range
+  let records = rawRecords.filter(r => dateSet.has(r.tgl));
+  let html = '<div class="table-wrap"><table><thead><tr><th class="sticky-name">Nama';
+  dates.forEach(d => { html += '<th>' + d.slice(8,10) + '<span class="range-label">' + ['Min','Sen','Sel','Rab','Kam','Jum','Sab'][new Date(d+'T00:00:00').getDay()] + '</span>'; });
+  html += '<th style="color:#facc15">ToT<th style="color:#4ade80">Hadir</tr></thead><tbody>';
+  TEACHERS.forEach(t => {
+    let rowRecords = records.filter(r => r.teacher_name === t);
+    let tot = rowRecords.filter(r => { const h = r.created_at ? r.created_at.slice(11,16) : ''; return h && h <= TIME_LIMIT; }).length;
+    let hadir = rowRecords.filter(r => r.created_at).length;
+    html += '<tr><td class="sticky-name">' + t + '</td>';
+    dates.forEach(d => {
+      let recs = rowRecords.filter(r => r.tgl === d);
+      if (recs.length === 0) {
+        const dt = new Date(d + 'T00:00:00');
+        const today = new Date();
+        const isFuture = dt > new Date(today.getFullYear(), today.getMonth(), today.getDate());
+        html += '<td class="' + (isFuture ? 'absent-future' : 'absent') + '">' + (isFuture ? '·' : '—') + '</td>';
+      } else {
+        const rec = recs[0];
+        const time = rec.created_at ? rec.created_at.slice(11,16) : '—';
+        let cls = 'time';
+        if (time <= TIME_LIMIT && time !== '—') cls += ' time-ontime';
+        else if (time !== '—') cls += ' time-late';
+        const onclick = `openModal('${rec.id}','${t.replace(/'/g,"\\'")}','${rec.tgl}','${time}','${(rec.latitude||'')}','${(rec.longitude||'')}','${(rec.photo_data||'').replace(/'/g,"\\'")}')`;
+        html += '<td class="' + cls + '" onclick="' + onclick + '">' + time + '</td>';
+      }
+    });
+    html += '<td class="stat tot">' + tot + '</td><td class="stat hadir">' + hadir + '</td></tr>';
+  });
+  html += '</tbody></table></div>';
+  // Update metrics
+  let allRecords = dates ? records : rawRecords;
+  let mTot = allRecords.filter(r => { const h = r.created_at ? r.created_at.slice(11,16) : ''; return h && h <= TIME_LIMIT; }).length;
+  let mHadir = allRecords.filter(r => r.created_at).length;
+  let totalSlots = TEACHERS.length * dates.length;
+  let mPct = totalSlots > 0 ? Math.round(mHadir / totalSlots * 100) + '%' : '0%';
+  if (document.getElementById('mTotSub')) document.getElementById('mTotSub').textContent = 'dari ' + mHadir + ' hadir';
+  if (document.getElementById('mHadirSub')) document.getElementById('mHadirSub').textContent = 'dari ' + totalSlots + ' slot';
+  if (document.getElementById('mPctSub')) document.getElementById('mPctSub').textContent = '▲ periode ini';
+  document.getElementById('mTot').textContent = mTot;
+  document.getElementById('mHadir').textContent = mHadir;
+  document.getElementById('mPct').textContent = mPct;
+  document.getElementById('footInfo').textContent = TEACHERS.length + ' guru · ' + dates.length + ' hari';
+  wrap.innerHTML = html;
+}
+
+// ====== FILTER ======
+function filterTable() {
+  const q = document.getElementById('searchInput').value.toLowerCase().trim();
+  document.querySelectorAll('#contentWrap tbody tr').forEach(tr => {
+    const name = tr.querySelector('td.sticky-name');
+    if (!name) return;
+    tr.style.display = name.textContent.toLowerCase().includes(q) ? '' : 'none';
+  });
+}
+
+// ====== LOAD DATA ======
 async function loadData() {
   const wrap = document.getElementById('contentWrap');
   wrap.innerHTML = '<div class="loading-wrap"><div class="spinner"></div><p>Memuat data rekap...</p></div>';
-
-  const dates = getDateRange();
-  const rangeLabel = fmtDateFull(dates[0]) + ' — ' + fmtDateFull(dates[dates.length-1]);
-
   try {
-    const url = SUPABASE_URL + '/rest/v1/' + TABLE +
-      '?select=id,teacher_name,tgl,created_at,latitude,longitude,location_accuracy' +
-      '&tgl=gte.' + dates[0] + '&tgl=lte.' + dates[dates.length-1] +
-      '&order=tgl.asc';
-    const res = await fetch(url, {
+    const res = await fetch(SUPABASE_URL + '/rest/v1/' + TABLE + '?select=id,teacher_name,tgl,created_at,latitude,longitude,photo_data&order=tgl.asc', {
       headers: { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY }
     });
-    if (!res.ok) throw new Error('HTTP ' + res.status);
-
-    const rows = await res.json();
-    cachedRecords = rows || [];
-
-    const lookup = {};
-    for (const r of cachedRecords) {
-      lookup[r.teacher_name + '|' + r.tgl] = r;
-    }
-
-    // Calculate ToT and total per teacher
-    const totCount = {};
-    const hadirCount = {};
-    for (const r of cachedRecords) {
-      hadirCount[r.teacher_name] = (hadirCount[r.teacher_name] || 0) + 1;
-      const { h, m } = wibTime(r.created_at);
-      if (h < 6 || (h === 6 && m < 51)) {
-        totCount[r.teacher_name] = (totCount[r.teacher_name] || 0) + 1;
-      }
-    }
-
-    // Build table
-    let html = '<div class="wrap"><table><thead><tr>';
-    html += '<th class="sticky-name">Nama <span class="range-label">' + rangeLabel + '</span></th>';
-    for (const d of dates) {
-      html += '<th>' + fmtDate(d) + '</th>';
-    }
-    html += '<th class="tot">ToT</th>';
-    html += '<th class="hadir">Total<br>Hadir</th>';
-    html += '</tr></thead><tbody>';
-
-    for (let i = 0; i < TEACHERS.length; i++) {
-      const teacher = TEACHERS[i];
-      html += '<tr>';
-      html += '<td class="sticky-name">' + teacher + '</td>';
-      for (const d of dates) {
-        const key = teacher + '|' + d;
-        const rec = lookup[key];
-        if (rec) {
-          const { h, m, str } = wibTime(rec.created_at);
-          const cls = (h < 6 || (h === 6 && m < 51)) ? 'time-ontime' : 'time-late';
-          html += '<td class="time ' + cls + '" onclick="openModal(\'' + rec.id + '\')">' + str + '</td>';
-        } else {
-          const dObj = new Date(d + 'T00:00:00');
-          const today = new Date();
-          today.setHours(0,0,0,0);
-          if (dObj < today) {
-            html += '<td class="absent">—</td>';
-          } else {
-            html += '<td class="absent-future">·</td>';
-          }
-        }
-      }
-      html += '<td class="stat tot">' + (totCount[teacher] || 0) + '</td>';
-      html += '<td class="stat hadir">' + (hadirCount[teacher] || 0) + '</td>';
-      html += '</tr>';
-    }
-
-    html += '</tbody></table></div>';
-    html += '<button class="float-refresh" onclick="loadData()" title="Muat ulang">↻</button>';
-    wrap.innerHTML = html;
-
+    if (!res.ok) { throw new Error('HTTP ' + res.status); }
+    rawRecords = await res.json();
+    buildPills();
+    const activePill = document.querySelector('.pill.active');
+    if (activePill) renderTable(JSON.parse(activePill.dataset.dates));
+    else renderTable([]);
   } catch (err) {
     wrap.innerHTML = '<div class="empty">❌ Gagal memuat data: ' + err.message + '</div>';
   }
 }
 
 // ====== MODAL ======
-async function openModal(recordId) {
-  const overlay = document.getElementById('modalOverlay');
-  const nameEl = document.getElementById('modalName');
-  const dateEl = document.getElementById('modalDate');
-  const imgEl = document.getElementById('modalImg');
-  const coordsEl = document.getElementById('modalCoords');
-
-  nameEl.textContent = 'Memuat...';
-  dateEl.textContent = '';
-  imgEl.src = '';
-  coordsEl.textContent = '';
-  modalRecordId = recordId;
-  modalRecord = null;
+function openModal(id, name, tgl, time, lat, lng, photo) {
+  currentEditId = id;
+  document.getElementById('modalName').textContent = name;
+  document.getElementById('modalDate').textContent = formatDate(tgl) + ' — ' + time;
+  document.getElementById('modalImg').src = photo || '';
+  document.getElementById('modalImg').style.display = photo ? '' : 'none';
+  let coords = '';
+  if (lat && lng) coords = '📍 ' + parseFloat(lat).toFixed(5) + ', ' + parseFloat(lng).toFixed(5);
+  document.getElementById('modalCoords').textContent = coords;
+  document.getElementById('modalView').style.display = 'block';
   document.getElementById('modalEditForm').classList.remove('show');
-  document.getElementById('modalView').style.display = '';
-  overlay.classList.add('show');
-
-  try {
-    const res = await fetch(SUPABASE_URL + '/rest/v1/' + TABLE + '?id=eq.' + recordId + '&select=*', {
-      headers: { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY }
-    });
-    if (!res.ok) throw new Error('HTTP ' + res.status);
-    const data = await res.json();
-    if (!data || !data.length) throw new Error('Data tidak ditemukan');
-
-    const rec = data[0];
-    modalRecord = rec;
-    nameEl.textContent = rec.teacher_name;
-    const { str: wib } = wibTime(rec.created_at);
-    dateEl.textContent = fmtDateFull(rec.tgl) + ' · ' + wib + ' WIB';
-    imgEl.src = rec.photo_data;
-    if (rec.latitude && rec.longitude) {
-      coordsEl.textContent = rec.latitude.toFixed(5) + ', ' + rec.longitude.toFixed(5) +
-        (rec.location_accuracy ? ' ±' + rec.location_accuracy.toFixed(0) + 'm' : '');
-    }
-  } catch (err) {
-    nameEl.textContent = 'Error';
-    dateEl.textContent = err.message;
-    imgEl.src = '';
-  }
+  document.getElementById('modalOverlay').classList.add('show');
 }
-
-function closeModal(ev) {
-  if (ev && ev.target !== document.getElementById('modalOverlay')) return;
+function closeModal(e) {
+  if (e && e.target !== document.getElementById('modalOverlay')) return;
   document.getElementById('modalOverlay').classList.remove('show');
+  currentEditId = null;
 }
-document.addEventListener('keydown', function(e) {
-  if (e.key === 'Escape') document.getElementById('modalOverlay').classList.remove('show');
-});
-document.getElementById('modalOverlay').addEventListener('click', function(ev) {
-  if (ev.target === this) this.classList.remove('show');
-});
-
-// ====== EDIT ======
 function editRecord() {
-  if (!modalRecord) return;
-  const { h, m } = wibTime(modalRecord.created_at);
-  document.getElementById('editTimeInput').value = String(h).padStart(2,'0') + ':' + String(m).padStart(2,'0');
+  const rec = rawRecords.find(r => r.id === currentEditId);
+  if (!rec) return;
+  const time = rec.created_at ? rec.created_at.slice(11,16) : '';
+  document.getElementById('editTimeInput').value = time;
   document.getElementById('modalView').style.display = 'none';
   document.getElementById('modalEditForm').classList.add('show');
 }
-
 function cancelEdit() {
+  document.getElementById('modalView').style.display = 'block';
   document.getElementById('modalEditForm').classList.remove('show');
-  document.getElementById('modalView').style.display = '';
 }
-
 async function saveEdit() {
-  if (!modalRecord || !modalRecordId) return;
-  const val = document.getElementById('editTimeInput').value;
-  if (!val) return alert('Masukkan jam presensi');
-
-  const [hh, mm] = val.split(':').map(Number);
-  if (hh < 0 || hh > 23 || mm < 0 || mm > 59) return alert('Jam tidak valid');
-
-  // rebuild created_at — pertahankan tanggal asli, ganti jam+menit
-  const orig = new Date(modalRecord.created_at);
-  const newCreated = new Date(Date.UTC(orig.getUTCFullYear(), orig.getUTCMonth(), orig.getUTCDate(), hh - 7, mm));
-  const iso = newCreated.toISOString();
-
-  const btn = document.querySelector('#modalEditForm .modal-btn-edit');
-  btn.textContent = 'Menyimpan...';
-  btn.disabled = true;
-
+  const newTime = document.getElementById('editTimeInput').value;
+  if (!newTime) return;
+  const rec = rawRecords.find(r => r.id === currentEditId);
+  if (!rec) return;
+  const oldDate = rec.tgl;
+  const newISO = oldDate + 'T' + newTime + ':00+07:00';
+  const newISOZ = new Date(newISO).toISOString();
   try {
-    const res = await fetch(SUPABASE_URL + '/rest/v1/' + TABLE + '?id=eq.' + modalRecordId, {
+    const res = await fetch(SUPABASE_URL + '/rest/v1/' + TABLE + '?id=eq.' + currentEditId, {
       method: 'PATCH',
       headers: {
-        'apikey': SUPABASE_KEY,
-        'Authorization': 'Bearer ' + SUPABASE_KEY,
         'Content-Type': 'application/json',
-        'Prefer': 'return=minimal',
-      },
-      body: JSON.stringify({ created_at: iso }),
-    });
-    if (!res.ok) throw new Error('HTTP ' + res.status);
-
-    cancelEdit();
-    closeModal();
-    loadData();
-  } catch (err) {
-    alert('Gagal menyimpan: ' + err.message);
-    btn.textContent = '💾 Simpan';
-    btn.disabled = false;
-  }
-}
-
-// ====== DELETE ======
-async function deleteRecord() {
-  if (!modalRecordId) return;
-  if (!confirm('Yakin hapus data presensi ' + (modalRecord ? modalRecord.teacher_name : '') + '?')) return;
-
-  const btn = document.querySelector('.modal-btn-danger');
-  btn.textContent = 'Menghapus...';
-  btn.disabled = true;
-
-  try {
-    const res = await fetch(SUPABASE_URL + '/rest/v1/' + TABLE + '?id=eq.' + modalRecordId, {
-      method: 'DELETE',
-      headers: {
         'apikey': SUPABASE_KEY,
         'Authorization': 'Bearer ' + SUPABASE_KEY,
-        'Prefer': 'return=minimal',
+        'Prefer': 'return=representation'
       },
+      body: JSON.stringify({ created_at: newISOZ })
     });
-    if (!res.ok) throw new Error('HTTP ' + res.status);
-
-    closeModal();
-    loadData();
-  } catch (err) {
-    alert('Gagal menghapus: ' + err.message);
-    btn.textContent = '🗑 Hapus';
-    btn.disabled = false;
-  }
+    if (res.ok) {
+      rec.created_at = newISOZ;
+      loadData();
+      showToast('✅ Jam berhasil diperbarui', 'success');
+      closeModal();
+    } else { showToast('❌ Gagal update', 'error'); }
+  } catch (err) { showToast('❌ ' + err.message, 'error'); }
 }
+async function deleteRecord() {
+  if (!confirm('Hapus presensi ini?')) return;
+  try {
+    const res = await fetch(SUPABASE_URL + '/rest/v1/' + TABLE + '?id=eq.' + currentEditId, {
+      method: 'DELETE',
+      headers: { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY }
+    });
+    if (res.ok || res.status === 204) {
+      rawRecords = rawRecords.filter(r => r.id !== currentEditId);
+      loadData();
+      showToast('🗑 Data berhasil dihapus', 'success');
+      closeModal();
+    } else { showToast('❌ Gagal hapus', 'error'); }
+  } catch (err) { showToast('❌ ' + err.message, 'error'); }
+}
+
+// ====== EXPORT ======
 function exportExcel() {
-  const dates = getDateRange();
-  const rangeLabel = fmtDateFull(dates[0]) + ' — ' + fmtDateFull(dates[dates.length-1]);
-  const lookup = {};
-  for (const r of cachedRecords) {
-    lookup[r.teacher_name + '|' + r.tgl] = r;
-  }
-
-  // Hitung ToT & Hadir
-  const totCount = {}, hadirCount = {};
-  for (const r of cachedRecords) {
-    hadirCount[r.teacher_name] = (hadirCount[r.teacher_name] || 0) + 1;
-    const { h, m } = wibTime(r.created_at);
-    if (h < 6 || (h === 6 && m < 51)) totCount[r.teacher_name] = (totCount[r.teacher_name] || 0) + 1;
-  }
-
-  // === Build data array ===
-  const headers = ['Nama'];
-  for (const d of dates) headers.push(fmtDate(d));
-  headers.push('ToT', 'Total Hadir');
-
-  const rows = [headers];
-  for (const teacher of TEACHERS) {
-    const row = [teacher];
-    for (const d of dates) {
-      const rec = lookup[teacher + '|' + d];
-      if (rec) {
-        const { h, m, str } = wibTime(rec.created_at);
-        row.push(str + ((h < 6 || (h === 6 && m < 51)) ? '' : '⚠'));
-      } else {
-        const dObj = new Date(d + 'T00:00:00');
-        const today = new Date(); today.setHours(0,0,0,0);
-        row.push(dObj < today ? '—' : '');
-      }
-    }
-    row.push(totCount[teacher] || 0);
-    row.push(hadirCount[teacher] || 0);
+  if (rawRecords.length === 0) { showToast('Tidak ada data untuk diexport', 'error'); return; }
+  const activePill = document.querySelector('.pill.active');
+  let dates = [];
+  if (activePill) dates = JSON.parse(activePill.dataset.dates);
+  else { dates = [...new Set(rawRecords.map(r => r.tgl))].sort(); }
+  const dateSet = new Set(dates);
+  let records = rawRecords.filter(r => dateSet.has(r.tgl));
+  const rows = [['Nama', ...dates.map(d => formatDate(d)), 'ToT', 'Hadir']];
+  TEACHERS.forEach(t => {
+    let rowRecords = records.filter(r => r.teacher_name === t);
+    let tot = rowRecords.filter(r => { const h = r.created_at ? r.created_at.slice(11,16) : ''; return h && h <= TIME_LIMIT; }).length;
+    let hadir = rowRecords.filter(r => r.created_at).length;
+    let row = [t];
+    dates.forEach(d => {
+      let recs = rowRecords.filter(r => r.tgl === d);
+      row.push(recs.length > 0 ? (recs[0].created_at ? recs[0].created_at.slice(11,16) : '✓') : '—');
+    });
+    row.push(tot, hadir);
     rows.push(row);
-  }
-
-  // === SheetJS workbook ===
-  const wb = XLSX.utils.book_new();
+  });
   const ws = XLSX.utils.aoa_to_sheet(rows);
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, 'Presensi');
+  const coldWidth = dates.map(() => ({wch:5}));
+  coldWidth.unshift({wch:30});
+  ws['!cols'] = coldWidth;
+  XLSX.writeFile(wb, 'Rekap_Presensi_ABBS.xlsx');
+  showToast('⎙ Excel berhasil didownload', 'success');
+}
 
-  // Column widths
-  ws['!cols'] = [
-    { wch: 24 },  // Nama
-    ...dates.map(() => ({ wch: 8 })),
-    { wch: 6 },   // ToT
-    { wch: 10 },  // Total Hadir
-  ];
-
-  // === styling ===
-  const darkBg = { patternType: 'solid', fgColor: { rgb: '0F172A' } };
-  const gold = { rgb: 'FBBF24' };
-  const green = { rgb: '4ADE80' };
-  const red = { rgb: 'FCA5A5' };
-  const muted = { rgb: '94A3B8' };
-  const white = { rgb: 'F1F5F9' };
-  const headerFont = { bold: true, color: muted, sz: 10 };
-  const nameFont = { bold: true, color: white, sz: 11 };
-  const statFontGold = { bold: true, color: gold, sz: 12 };
-  const statFontGreen = { bold: true, color: green, sz: 12 };
-  const cellBorder = {
-    top: { style: 'thin', color: { rgb: '1E293B' } },
-    bottom: { style: 'thin', color: { rgb: '1E293B' } },
-  };
-
-  // Header row (row 1)
-  const ncols = headers.length;
-  for (let c = 0; c < ncols; c++) {
-    const ref = XLSX.utils.encode_cell({ r: 0, c });
-    if (!ws[ref]) ws[ref] = {};
-    ws[ref].s = { font: headerFont, fill: darkBg, alignment: { horizontal: 'center', vertical: 'middle' }, border: cellBorder };
+// ====== TOAST ======
+function showToast(msg, type) {
+  let t = document.getElementById('toast');
+  if (!t) {
+    t = document.createElement('div');
+    t.id = 'toast';
+    t.style.cssText = 'position:fixed;top:16px;left:50%;transform:translateX(-50%);padding:10px 24px;border-radius:12px;font-size:13px;font-weight:600;z-index:9999;transition:all .3s;opacity:0;pointer-events:none;max-width:90%;box-shadow:0 4px 24px rgba(0,0,0,0.5);';
+    document.body.appendChild(t);
   }
-
-  // Data rows (row 2+)
-  for (let r = 1; r < rows.length; r++) {
-    for (let c = 0; c < ncols; c++) {
-      const ref = XLSX.utils.encode_cell({ r, c });
-      if (!ws[ref]) ws[ref] = {};
-      const style = { fill: darkBg, alignment: { vertical: 'middle' }, border: cellBorder };
-      if (c === 0) {
-        style.font = nameFont;
-        style.alignment = { horizontal: 'left', vertical: 'middle' };
-      } else if (c === ncols - 2) { // ToT
-        style.font = statFontGold;
-        style.alignment = { horizontal: 'center', vertical: 'middle' };
-      } else if (c === ncols - 1) { // Total Hadir
-        style.font = statFontGreen;
-        style.alignment = { horizontal: 'center', vertical: 'middle' };
-      } else {
-        style.font = { color: muted, sz: 10 };
-        style.alignment = { horizontal: 'center', vertical: 'middle' };
-      }
-      ws[ref].s = style;
-
-      // Warna sel time: ontime = green, late = gold
-      if (c > 0 && c < ncols - 2) {
-        const val = rows[r][c];
-        if (val && !val.startsWith('—') && val !== '') {
-          if (val.endsWith('⚠')) {
-            style.font = { color: gold, bold: true, sz: 10 };
-            ws[ref].s = style;
-          } else {
-            style.font = { color: green, sz: 10 };
-            ws[ref].s = style;
-          }
-        } else if (val === '—') {
-          style.font = { color: { rgb: '334155' }, sz: 10 };
-          ws[ref].s = style;
-        }
-      }
-    }
-  }
-
-  // Freeze pane (column Nama + header row)
-  ws['!freeze'] = { xSplit: 1, ySplit: 1 };
-
-  // Sheet name
-  XLSX.utils.book_append_sheet(wb, ws, 'Rekap Presensi');
-  XLSX.writeFile(wb, 'rekap-presensi-' + dates[0] + '.xlsx');
+  t.textContent = msg;
+  t.style.background = type === 'success' ? '#166534' : type === 'error' ? '#991b1b' : '#334155';
+  t.style.color = type === 'success' ? '#bbf7d0' : type === 'error' ? '#fecaca' : '#e2e8f0';
+  t.style.opacity = '1';
+  clearTimeout(t._timer);
+  t._timer = setTimeout(() => { t.style.opacity = '0'; }, 3000);
 }
 
 // ====== INIT ======
 document.addEventListener('DOMContentLoaded', loadData);
+document.getElementById('searchInput').addEventListener('input', filterTable);
 </script>
 </body>
 </html>
