@@ -3,19 +3,21 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
-<title>Rekap Presensi</title>
+<title>Rekap Presensi — SMP ABBS Surakarta</title>
 <style>
 * { margin: 0; padding: 0; box-sizing: border-box; }
 body {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   background: #0f172a; color: #e2e8f0; min-height: 100vh;
 }
-/* TITLE BAR — single line above table */
+/* TITLE BAR */
 .title-bar {
-  background: #0f172a; padding: 8px 14px; font-size: 14px; font-weight: 700;
-  color: #fbbf24; letter-spacing: 1.5px; border-bottom: 1px solid #1e293b;
-  line-height: 1.2;
+  background: linear-gradient(135deg,#1e293b 0%,#0f172a 100%);
+  padding: 14px 16px 10px; text-align: center;
+  border-bottom: 1px solid #1e293b;
 }
+.title-bar h1 { font-size: 18px; font-weight: 800; color: #fbbf24; letter-spacing: 2px; }
+.title-bar .sub { font-size: 11px; color: #94a3b8; letter-spacing: 1px; margin-top: 1px; }
 /* WRAP */
 .wrap { max-width: 100%; overflow-x: auto; }
 table {
@@ -26,25 +28,30 @@ table {
 thead { position: sticky; top: 0; z-index: 40; }
 th {
   background: #0f172a; color: #94a3b8; font-weight: 700;
-  padding: 10px 6px; text-align: center; white-space: nowrap;
+  padding: 10px 4px; text-align: center; white-space: nowrap;
   border-bottom: 1px solid #1e293b;
-  font-size: 11px; letter-spacing: 0.5px;
+  font-size: 10px; letter-spacing: 0.3px;
 }
-th.sticky-name { position: sticky; left: 0; z-index: 42; background: #0f172a; min-width: 160px; text-align: left; padding-left: 10px; }
+th.sticky-name { position: sticky; left: 0; z-index: 42; background: #0f172a; min-width: 155px; text-align: left; padding-left: 10px; }
+th .range-label { color: #38bdf8; font-weight: 400; font-size: 8px; display: block; letter-spacing: 0; margin-top: 1px; }
 td {
-  padding: 6px; text-align: center; border-bottom: 1px solid #1e293b;
+  padding: 5px 3px; text-align: center; border-bottom: 1px solid #1e293b;
   vertical-align: middle;
 }
 tr:last-child td { border-bottom: none; }
 tr:hover td { background: #1e293b88; }
-td.sticky-name { position: sticky; left: 0; z-index: 1; background: #0f172a; text-align: left; padding-left: 10px; font-weight: 600; color: #f1f5f9; }
+td.sticky-name { position: sticky; left: 0; z-index: 1; background: #0f172a; text-align: left; padding-left: 10px; font-weight: 600; color: #f1f5f9; font-size: 12px; }
 tr:hover td.sticky-name { background: #1e293b; }
-/* DATE CELLS */
-td.present { color: #4ade80; cursor: pointer; font-size: 14px; }
-td.present:hover { background: #16653455; border-radius: 4px; }
-td.absent { color: #334155; font-size: 12px; }
+/* TIME CELLS */
+td.time { font-family: 'SF Mono','Menlo','Fira Code',monospace; font-size: 11px; font-weight: 600; cursor: pointer; padding: 5px 3px; min-width: 38px; }
+td.time-ontime { color: #4ade80; }
+td.time-ontime:hover { background: #16653455; border-radius: 3px; }
+td.time-late { color: #fbbf24; }
+td.time-late:hover { background: #78350f55; border-radius: 3px; }
+td.absent { color: #334155; font-size: 11px; }
+td.absent-future { color: #1e293b; font-size: 11px; }
 /* TOT & HADIR */
-td.stat { font-weight: 700; font-size: 13px; }
+td.stat { font-weight: 700; font-size: 12px; padding: 5px 8px; }
 td.tot { color: #facc15; }
 td.hadir { color: #4ade80; }
 /* LOADING */
@@ -52,9 +59,7 @@ td.hadir { color: #4ade80; }
 .spinner { width: 36px; height: 36px; border: 3px solid #1e293b; border-top-color: #fbbf24; border-radius: 50%; animation: spin .8s linear infinite; }
 @keyframes spin { to { transform: rotate(360deg); } }
 .loading-wrap p { color: #94a3b8; font-size: 14px; }
-/* RANGE LABEL in first header cell */
-th .range-label { color: #38bdf8; font-weight: 400; font-size: 9px; display: block; letter-spacing: 0; }
-/* REFRESH — floating button */
+/* REFRESH */
 .float-refresh {
   position: fixed; bottom: 20px; right: 20px; z-index: 99;
   width: 44px; height: 44px; border-radius: 50%;
@@ -89,17 +94,22 @@ th .range-label { color: #38bdf8; font-weight: 400; font-size: 9px; display: blo
 .empty { text-align: center; padding: 40px 20px; color: #64748b; font-size: 14px; }
 /* MOBILE */
 @media(max-width:640px){
-  th { font-size: 10px; padding: 8px 4px; }
-  th.sticky-name { min-width: 120px; font-size: 10px; }
-  td { padding: 4px; font-size: 11px; }
-  td.sticky-name { min-width: 120px; font-size: 12px; }
-  td.present { font-size: 12px; }
+  .title-bar h1 { font-size: 15px; }
+  th { font-size: 9px; padding: 8px 2px; }
+  th.sticky-name { min-width: 110px; font-size: 9px; }
+  td { padding: 4px 2px; font-size: 10px; }
+  td.sticky-name { min-width: 110px; font-size: 11px; }
+  td.time { font-size: 10px; min-width: 32px; }
 }
 </style>
 </head>
 <body>
 
-<div class="title-bar">REKAP PRESENSI</div>
+<div class="title-bar">
+  <h1>REKAP PRESENSI</h1>
+  <div class="sub">SMP ABBS Surakarta</div>
+</div>
+
 <div id="contentWrap"><div class="loading-wrap"><div class="spinner"></div><p>Memuat data rekap...</p></div></div>
 
 <!-- MODAL -->
@@ -169,6 +179,14 @@ function fmtDateFull(iso) {
   return d.getDate() + ' ' + months[d.getMonth()] + ' ' + d.getFullYear();
 }
 
+// ====== WIB TIME FROM ISO ======
+function wibTime(iso) {
+  const d = new Date(iso);
+  const h = (d.getUTCHours() + 7) % 24;
+  const m = d.getUTCMinutes();
+  return { h, m, str: String(h).padStart(2,'0') + ':' + String(m).padStart(2,'0') };
+}
+
 // ====== STATE ======
 let cachedRecords = [];
 
@@ -198,13 +216,12 @@ async function loadData() {
       lookup[r.teacher_name + '|' + r.tgl] = r;
     }
 
+    // Calculate ToT and total per teacher
     const totCount = {};
     const hadirCount = {};
     for (const r of cachedRecords) {
       hadirCount[r.teacher_name] = (hadirCount[r.teacher_name] || 0) + 1;
-      const d = new Date(r.created_at);
-      const h = (d.getUTCHours() + 7) % 24;
-      const m = d.getUTCMinutes();
+      const { h, m } = wibTime(r.created_at);
       if (h < 6 || (h === 6 && m < 51)) {
         totCount[r.teacher_name] = (totCount[r.teacher_name] || 0) + 1;
       }
@@ -217,7 +234,7 @@ async function loadData() {
       html += '<th>' + fmtDate(d) + '</th>';
     }
     html += '<th class="tot">ToT</th>';
-    html += '<th class="hadir">Total Hadir</th>';
+    html += '<th class="hadir">Total<br>Hadir</th>';
     html += '</tr></thead><tbody>';
 
     for (let i = 0; i < TEACHERS.length; i++) {
@@ -228,10 +245,9 @@ async function loadData() {
         const key = teacher + '|' + d;
         const rec = lookup[key];
         if (rec) {
-          const ct = new Date(rec.created_at);
-          const ch = (ct.getUTCHours() + 7) % 24;
-          const cm = String(ct.getUTCMinutes()).padStart(2,'0');
-          html += '<td class="present" onclick="openModal(\'' + rec.id + '\')">' + String(ch).padStart(2,'0') + ':' + cm + '</td>';
+          const { h, m, str } = wibTime(rec.created_at);
+          const cls = (h < 6 || (h === 6 && m < 51)) ? 'time-ontime' : 'time-late';
+          html += '<td class="time ' + cls + '" onclick="openModal(\'' + rec.id + '\')">' + str + '</td>';
         } else {
           const dObj = new Date(d + 'T00:00:00');
           const today = new Date();
@@ -239,7 +255,7 @@ async function loadData() {
           if (dObj < today) {
             html += '<td class="absent">—</td>';
           } else {
-            html += '<td class="absent">·</td>';
+            html += '<td class="absent-future">·</td>';
           }
         }
       }
@@ -281,11 +297,8 @@ async function openModal(recordId) {
 
     const rec = data[0];
     nameEl.textContent = rec.teacher_name;
-    const d = new Date(rec.created_at);
-    const wibH = (d.getUTCHours() + 7) % 24;
-    const wibM = d.getUTCMinutes();
-    const wibTime = String(wibH).padStart(2,'0') + ':' + String(wibM).padStart(2,'0') + ' WIB';
-    dateEl.textContent = fmtDateFull(rec.tgl) + ' · ' + wibTime;
+    const { str: wib } = wibTime(rec.created_at);
+    dateEl.textContent = fmtDateFull(rec.tgl) + ' · ' + wib + ' WIB';
     imgEl.src = rec.photo_data;
     if (rec.latitude && rec.longitude) {
       coordsEl.textContent = rec.latitude.toFixed(5) + ', ' + rec.longitude.toFixed(5) +
