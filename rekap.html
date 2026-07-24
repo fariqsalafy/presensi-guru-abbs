@@ -85,18 +85,40 @@ td.hadir { color: #4ade80; }
 .modal-box .modal-date { font-size: 12px; color: #94a3b8; margin-bottom: 12px; }
 .modal-box .modal-coords { font-size: 11px; color: #64748b; margin-top: 8px; word-break: break-all; }
 .modal-box img { max-width: 100%; border-radius: 12px; margin-top: 8px; }
-.modal-close {
-  display: inline-block; margin-top: 14px; padding: 8px 24px;
-  background: #334155; color: #e2e8f0; border: none; border-radius: 10px;
-  font-size: 13px; font-weight: 600; cursor: pointer;
+/* MODAL ACTIONS */
+.modal-actions {
+  display: flex; gap: 8px; justify-content: center; flex-wrap: wrap;
+  margin-top: 16px; border-top: 1px solid #1e293b; padding-top: 14px;
 }
-.modal-close:hover { background: #475569; }
-.modal-delete {
-  display: inline-block; margin-top: 14px; margin-left: 8px; padding: 8px 24px;
-  background: #7f1d1d; color: #fca5a5; border: 1px solid #991b1b; border-radius: 10px;
-  font-size: 13px; font-weight: 600; cursor: pointer;
+.modal-btn {
+  display: inline-flex; align-items: center; gap: 5px;
+  padding: 9px 18px; border-radius: 10px; font-size: 12px;
+  font-weight: 700; cursor: pointer; border: none; letter-spacing: 0.3px;
+  transition: background .15s;
 }
-.modal-delete:hover { background: #991b1b; }
+.modal-btn-close  { background: #334155; color: #e2e8f0; }
+.modal-btn-close:hover { background: #475569; }
+.modal-btn-edit   { background: #1e3a5f; color: #60a5fa; border: 1px solid #1e40af; }
+.modal-btn-edit:hover  { background: #1e40af; }
+.modal-btn-danger { background: #7f1d1d; color: #fca5a5; border: 1px solid #991b1b; }
+.modal-btn-danger:hover { background: #991b1b; }
+/* EDIT FORM */
+.modal-edit-form {
+  display: none; margin-top: 12px; text-align: left;
+}
+.modal-edit-form.show { display: block; }
+.modal-edit-form label {
+  display: block; font-size: 11px; color: #94a3b8; margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.5px;
+}
+.modal-edit-form input {
+  width: 100%; padding: 10px 12px; background: #0f172a; border: 1px solid #334155;
+  border-radius: 8px; color: #e2e8f0; font-size: 14px; font-family: 'SF Mono','Menlo',monospace;
+  margin-bottom: 12px; outline: none;
+}
+.modal-edit-form input:focus { border-color: #60a5fa; }
+.modal-edit-form .edit-actions {
+  display: flex; gap: 8px; justify-content: flex-end;
+}
 /* BUTTON BAR */
 .btn-bar {
   display: flex; gap: 8px; justify-content: center; padding: 10px 16px;
@@ -144,8 +166,25 @@ td.hadir { color: #4ade80; }
     <div class="modal-date" id="modalDate"></div>
     <img id="modalImg" src="" alt="Foto">
     <div class="modal-coords" id="modalCoords"></div>
-    <button class="modal-close" onclick="closeModal()">Tutup</button>
-    <button class="modal-delete" id="modalDeleteBtn" onclick="deleteRecord()">✕ Hapus</button>
+
+    <!-- VIEW MODE -->
+    <div id="modalView">
+      <div class="modal-actions">
+        <button class="modal-btn modal-btn-close" onclick="closeModal()">✕ Tutup</button>
+        <button class="modal-btn modal-btn-edit" onclick="editRecord()">✎ Edit</button>
+        <button class="modal-btn modal-btn-danger" onclick="deleteRecord()">🗑 Hapus</button>
+      </div>
+    </div>
+
+    <!-- EDIT MODE -->
+    <div class="modal-edit-form" id="modalEditForm">
+      <label>Jam Presensi (HH:mm)</label>
+      <input type="time" id="editTimeInput">
+      <div class="edit-actions">
+        <button class="modal-btn modal-btn-close" onclick="cancelEdit()">Batal</button>
+        <button class="modal-btn modal-btn-edit" onclick="saveEdit()">💾 Simpan</button>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -219,6 +258,7 @@ function wibTime(iso) {
 // ====== STATE ======
 let cachedRecords = [];
 let modalRecordId = null;
+let modalRecord = null;
 
 // ====== MAIN ======
 async function loadData() {
@@ -310,13 +350,15 @@ async function openModal(recordId) {
   const dateEl = document.getElementById('modalDate');
   const imgEl = document.getElementById('modalImg');
   const coordsEl = document.getElementById('modalCoords');
-  const deleteBtn = document.getElementById('modalDeleteBtn');
 
   nameEl.textContent = 'Memuat...';
   dateEl.textContent = '';
   imgEl.src = '';
   coordsEl.textContent = '';
   modalRecordId = recordId;
+  modalRecord = null;
+  document.getElementById('modalEditForm').classList.remove('show');
+  document.getElementById('modalView').style.display = '';
   overlay.classList.add('show');
 
   try {
@@ -328,6 +370,7 @@ async function openModal(recordId) {
     if (!data || !data.length) throw new Error('Data tidak ditemukan');
 
     const rec = data[0];
+    modalRecord = rec;
     nameEl.textContent = rec.teacher_name;
     const { str: wib } = wibTime(rec.created_at);
     dateEl.textContent = fmtDateFull(rec.tgl) + ' · ' + wib + ' WIB';
@@ -354,7 +397,88 @@ document.getElementById('modalOverlay').addEventListener('click', function(ev) {
   if (ev.target === this) this.classList.remove('show');
 });
 
-// ====== EXPORT EXCEL ======
+// ====== EDIT ======
+function editRecord() {
+  if (!modalRecord) return;
+  const { h, m } = wibTime(modalRecord.created_at);
+  document.getElementById('editTimeInput').value = String(h).padStart(2,'0') + ':' + String(m).padStart(2,'0');
+  document.getElementById('modalView').style.display = 'none';
+  document.getElementById('modalEditForm').classList.add('show');
+}
+
+function cancelEdit() {
+  document.getElementById('modalEditForm').classList.remove('show');
+  document.getElementById('modalView').style.display = '';
+}
+
+async function saveEdit() {
+  if (!modalRecord || !modalRecordId) return;
+  const val = document.getElementById('editTimeInput').value;
+  if (!val) return alert('Masukkan jam presensi');
+
+  const [hh, mm] = val.split(':').map(Number);
+  if (hh < 0 || hh > 23 || mm < 0 || mm > 59) return alert('Jam tidak valid');
+
+  // rebuild created_at — pertahankan tanggal asli, ganti jam+menit
+  const orig = new Date(modalRecord.created_at);
+  const newCreated = new Date(Date.UTC(orig.getUTCFullYear(), orig.getUTCMonth(), orig.getUTCDate(), hh - 7, mm));
+  const iso = newCreated.toISOString();
+
+  const btn = document.querySelector('#modalEditForm .modal-btn-edit');
+  btn.textContent = 'Menyimpan...';
+  btn.disabled = true;
+
+  try {
+    const res = await fetch(SUPABASE_URL + '/rest/v1/' + TABLE + '?id=eq.' + modalRecordId, {
+      method: 'PATCH',
+      headers: {
+        'apikey': SUPABASE_KEY,
+        'Authorization': 'Bearer ' + SUPABASE_KEY,
+        'Content-Type': 'application/json',
+        'Prefer': 'return=minimal',
+      },
+      body: JSON.stringify({ created_at: iso }),
+    });
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+
+    cancelEdit();
+    closeModal();
+    loadData();
+  } catch (err) {
+    alert('Gagal menyimpan: ' + err.message);
+    btn.textContent = '💾 Simpan';
+    btn.disabled = false;
+  }
+}
+
+// ====== DELETE ======
+async function deleteRecord() {
+  if (!modalRecordId) return;
+  if (!confirm('Yakin hapus data presensi ' + (modalRecord ? modalRecord.teacher_name : '') + '?')) return;
+
+  const btn = document.querySelector('.modal-btn-danger');
+  btn.textContent = 'Menghapus...';
+  btn.disabled = true;
+
+  try {
+    const res = await fetch(SUPABASE_URL + '/rest/v1/' + TABLE + '?id=eq.' + modalRecordId, {
+      method: 'DELETE',
+      headers: {
+        'apikey': SUPABASE_KEY,
+        'Authorization': 'Bearer ' + SUPABASE_KEY,
+        'Prefer': 'return=minimal',
+      },
+    });
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+
+    closeModal();
+    loadData();
+  } catch (err) {
+    alert('Gagal menghapus: ' + err.message);
+    btn.textContent = '🗑 Hapus';
+    btn.disabled = false;
+  }
+}
 function exportExcel() {
   const dates = getDateRange();
   const rangeLabel = fmtDateFull(dates[0]) + ' — ' + fmtDateFull(dates[dates.length-1]);
@@ -477,35 +601,6 @@ function exportExcel() {
   // Sheet name
   XLSX.utils.book_append_sheet(wb, ws, 'Rekap Presensi');
   XLSX.writeFile(wb, 'rekap-presensi-' + dates[0] + '.xlsx');
-}
-
-// ====== DELETE RECORD ======
-async function deleteRecord() {
-  if (!modalRecordId) return;
-  if (!confirm('Yakin hapus data presensi ini?')) return;
-
-  const btn = document.getElementById('modalDeleteBtn');
-  btn.textContent = 'Menghapus...';
-  btn.disabled = true;
-
-  try {
-    const res = await fetch(SUPABASE_URL + '/rest/v1/' + TABLE + '?id=eq.' + modalRecordId, {
-      method: 'DELETE',
-      headers: {
-        'apikey': SUPABASE_KEY,
-        'Authorization': 'Bearer ' + SUPABASE_KEY,
-        'Prefer': 'return=minimal',
-      },
-    });
-    if (!res.ok) throw new Error('HTTP ' + res.status);
-
-    closeModal();
-    loadData();
-  } catch (err) {
-    alert('Gagal menghapus: ' + err.message);
-    btn.textContent = '✕ Hapus';
-    btn.disabled = false;
-  }
 }
 
 // ====== INIT ======
