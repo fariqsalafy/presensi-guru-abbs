@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
 <title>Rekap Presensi — SMP ABBS Surakarta</title>
+<script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
 <style>
 * { margin: 0; padding: 0; box-sizing: border-box; }
 body {
@@ -90,6 +91,26 @@ td.hadir { color: #4ade80; }
   font-size: 13px; font-weight: 600; cursor: pointer;
 }
 .modal-close:hover { background: #475569; }
+.modal-delete {
+  display: inline-block; margin-top: 14px; margin-left: 8px; padding: 8px 24px;
+  background: #7f1d1d; color: #fca5a5; border: 1px solid #991b1b; border-radius: 10px;
+  font-size: 13px; font-weight: 600; cursor: pointer;
+}
+.modal-delete:hover { background: #991b1b; }
+/* BUTTON BAR */
+.btn-bar {
+  display: flex; gap: 8px; justify-content: center; padding: 10px 16px;
+  background: #0f172a; border-bottom: 1px solid #1e293b; flex-wrap: wrap;
+}
+.btn-bar button {
+  padding: 8px 18px; border: 1px solid #334155; border-radius: 10px;
+  font-size: 12px; font-weight: 700; cursor: pointer; display: inline-flex;
+  align-items: center; gap: 6px; letter-spacing: 0.3px;
+}
+.btn-export {
+  background: #1e293b; color: #38bdf8;
+}
+.btn-export:hover { background: #334155; }
 /* NO DATA */
 .empty { text-align: center; padding: 40px 20px; color: #64748b; font-size: 14px; }
 /* MOBILE */
@@ -110,6 +131,10 @@ td.hadir { color: #4ade80; }
   <div class="sub">SMP ABBS Surakarta</div>
 </div>
 
+<div class="btn-bar">
+  <button class="btn-export" onclick="exportExcel()">⎙ Export Excel</button>
+</div>
+
 <div id="contentWrap"><div class="loading-wrap"><div class="spinner"></div><p>Memuat data rekap...</p></div></div>
 
 <!-- MODAL -->
@@ -120,6 +145,7 @@ td.hadir { color: #4ade80; }
     <img id="modalImg" src="" alt="Foto">
     <div class="modal-coords" id="modalCoords"></div>
     <button class="modal-close" onclick="closeModal()">Tutup</button>
+    <button class="modal-delete" id="modalDeleteBtn" onclick="deleteRecord()">✕ Hapus</button>
   </div>
 </div>
 
@@ -192,6 +218,7 @@ function wibTime(iso) {
 
 // ====== STATE ======
 let cachedRecords = [];
+let modalRecordId = null;
 
 // ====== MAIN ======
 async function loadData() {
@@ -283,11 +310,13 @@ async function openModal(recordId) {
   const dateEl = document.getElementById('modalDate');
   const imgEl = document.getElementById('modalImg');
   const coordsEl = document.getElementById('modalCoords');
+  const deleteBtn = document.getElementById('modalDeleteBtn');
 
   nameEl.textContent = 'Memuat...';
   dateEl.textContent = '';
   imgEl.src = '';
   coordsEl.textContent = '';
+  modalRecordId = recordId;
   overlay.classList.add('show');
 
   try {
@@ -324,6 +353,160 @@ document.addEventListener('keydown', function(e) {
 document.getElementById('modalOverlay').addEventListener('click', function(ev) {
   if (ev.target === this) this.classList.remove('show');
 });
+
+// ====== EXPORT EXCEL ======
+function exportExcel() {
+  const dates = getDateRange();
+  const rangeLabel = fmtDateFull(dates[0]) + ' — ' + fmtDateFull(dates[dates.length-1]);
+  const lookup = {};
+  for (const r of cachedRecords) {
+    lookup[r.teacher_name + '|' + r.tgl] = r;
+  }
+
+  // Hitung ToT & Hadir
+  const totCount = {}, hadirCount = {};
+  for (const r of cachedRecords) {
+    hadirCount[r.teacher_name] = (hadirCount[r.teacher_name] || 0) + 1;
+    const { h, m } = wibTime(r.created_at);
+    if (h < 6 || (h === 6 && m < 51)) totCount[r.teacher_name] = (totCount[r.teacher_name] || 0) + 1;
+  }
+
+  // === Build data array ===
+  const headers = ['Nama'];
+  for (const d of dates) headers.push(fmtDate(d));
+  headers.push('ToT', 'Total Hadir');
+
+  const rows = [headers];
+  for (const teacher of TEACHERS) {
+    const row = [teacher];
+    for (const d of dates) {
+      const rec = lookup[teacher + '|' + d];
+      if (rec) {
+        const { h, m, str } = wibTime(rec.created_at);
+        row.push(str + ((h < 6 || (h === 6 && m < 51)) ? '' : '⚠'));
+      } else {
+        const dObj = new Date(d + 'T00:00:00');
+        const today = new Date(); today.setHours(0,0,0,0);
+        row.push(dObj < today ? '—' : '');
+      }
+    }
+    row.push(totCount[teacher] || 0);
+    row.push(hadirCount[teacher] || 0);
+    rows.push(row);
+  }
+
+  // === SheetJS workbook ===
+  const wb = XLSX.utils.book_new();
+  const ws = XLSX.utils.aoa_to_sheet(rows);
+
+  // Column widths
+  ws['!cols'] = [
+    { wch: 24 },  // Nama
+    ...dates.map(() => ({ wch: 8 })),
+    { wch: 6 },   // ToT
+    { wch: 10 },  // Total Hadir
+  ];
+
+  // === styling ===
+  const darkBg = { patternType: 'solid', fgColor: { rgb: '0F172A' } };
+  const gold = { rgb: 'FBBF24' };
+  const green = { rgb: '4ADE80' };
+  const red = { rgb: 'FCA5A5' };
+  const muted = { rgb: '94A3B8' };
+  const white = { rgb: 'F1F5F9' };
+  const headerFont = { bold: true, color: muted, sz: 10 };
+  const nameFont = { bold: true, color: white, sz: 11 };
+  const statFontGold = { bold: true, color: gold, sz: 12 };
+  const statFontGreen = { bold: true, color: green, sz: 12 };
+  const cellBorder = {
+    top: { style: 'thin', color: { rgb: '1E293B' } },
+    bottom: { style: 'thin', color: { rgb: '1E293B' } },
+  };
+
+  // Header row (row 1)
+  const ncols = headers.length;
+  for (let c = 0; c < ncols; c++) {
+    const ref = XLSX.utils.encode_cell({ r: 0, c });
+    if (!ws[ref]) ws[ref] = {};
+    ws[ref].s = { font: headerFont, fill: darkBg, alignment: { horizontal: 'center', vertical: 'middle' }, border: cellBorder };
+  }
+
+  // Data rows (row 2+)
+  for (let r = 1; r < rows.length; r++) {
+    for (let c = 0; c < ncols; c++) {
+      const ref = XLSX.utils.encode_cell({ r, c });
+      if (!ws[ref]) ws[ref] = {};
+      const style = { fill: darkBg, alignment: { vertical: 'middle' }, border: cellBorder };
+      if (c === 0) {
+        style.font = nameFont;
+        style.alignment = { horizontal: 'left', vertical: 'middle' };
+      } else if (c === ncols - 2) { // ToT
+        style.font = statFontGold;
+        style.alignment = { horizontal: 'center', vertical: 'middle' };
+      } else if (c === ncols - 1) { // Total Hadir
+        style.font = statFontGreen;
+        style.alignment = { horizontal: 'center', vertical: 'middle' };
+      } else {
+        style.font = { color: muted, sz: 10 };
+        style.alignment = { horizontal: 'center', vertical: 'middle' };
+      }
+      ws[ref].s = style;
+
+      // Warna sel time: ontime = green, late = gold
+      if (c > 0 && c < ncols - 2) {
+        const val = rows[r][c];
+        if (val && !val.startsWith('—') && val !== '') {
+          if (val.endsWith('⚠')) {
+            style.font = { color: gold, bold: true, sz: 10 };
+            ws[ref].s = style;
+          } else {
+            style.font = { color: green, sz: 10 };
+            ws[ref].s = style;
+          }
+        } else if (val === '—') {
+          style.font = { color: { rgb: '334155' }, sz: 10 };
+          ws[ref].s = style;
+        }
+      }
+    }
+  }
+
+  // Freeze pane (column Nama + header row)
+  ws['!freeze'] = { xSplit: 1, ySplit: 1 };
+
+  // Sheet name
+  XLSX.utils.book_append_sheet(wb, ws, 'Rekap Presensi');
+  XLSX.writeFile(wb, 'rekap-presensi-' + dates[0] + '.xlsx');
+}
+
+// ====== DELETE RECORD ======
+async function deleteRecord() {
+  if (!modalRecordId) return;
+  if (!confirm('Yakin hapus data presensi ini?')) return;
+
+  const btn = document.getElementById('modalDeleteBtn');
+  btn.textContent = 'Menghapus...';
+  btn.disabled = true;
+
+  try {
+    const res = await fetch(SUPABASE_URL + '/rest/v1/' + TABLE + '?id=eq.' + modalRecordId, {
+      method: 'DELETE',
+      headers: {
+        'apikey': SUPABASE_KEY,
+        'Authorization': 'Bearer ' + SUPABASE_KEY,
+        'Prefer': 'return=minimal',
+      },
+    });
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+
+    closeModal();
+    loadData();
+  } catch (err) {
+    alert('Gagal menghapus: ' + err.message);
+    btn.textContent = '✕ Hapus';
+    btn.disabled = false;
+  }
+}
 
 // ====== INIT ======
 document.addEventListener('DOMContentLoaded', loadData);
