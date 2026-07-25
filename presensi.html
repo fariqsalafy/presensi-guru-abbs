@@ -243,6 +243,17 @@ let isCameraReady = false;
 let isSubmitting = false;
 let isLocating = false;
 
+// ====== LOKASI RADIUS ======
+const SCHOOL_LAT = -7.53918;
+const SCHOOL_LON = 110.80587;
+const MAX_DIST = 100;
+function haversine(lat1, lon1, lat2, lon2) {
+  const R = 6371000;
+  const dLat = (lat2-lat1)*Math.PI/180, dLon = (lon2-lon1)*Math.PI/180;
+  const a = Math.sin(dLat/2)**2 + Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*Math.sin(dLon/2)**2;
+  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+}
+
 document.addEventListener('DOMContentLoaded', () => {
   // Set date
   const days = ['Min','Sen','Sel','Rab','Kam','Jum','Sab'];
@@ -401,12 +412,20 @@ function getLocation() {
   navigator.geolocation.getCurrentPosition(
     (pos) => {
       currentPosition = { lat: pos.coords.latitude, lng: pos.coords.longitude, acc: pos.coords.accuracy };
+      const dist = Math.round(haversine(pos.coords.latitude, pos.coords.longitude, SCHOOL_LAT, SCHOOL_LON));
+      currentPosition.distance = dist;
+      currentPosition.inRange = dist <= MAX_DIST;
       const status = document.getElementById('locStatus');
-      status.className = 'stat ok';
-      status.textContent = '📍 Lokasi didapatkan';
+      if (currentPosition.inRange) {
+        status.className = 'stat ok';
+        status.textContent = '📍 Dalam radius ' + MAX_DIST + 'm';
+      } else {
+        status.className = 'stat fail';
+        status.textContent = '📍 Di luar radius (' + dist + 'm)';
+      }
       const accText = currentPosition.acc < 50 ? 'Akurat' : 'Kurang akurat';
       document.getElementById('locCoords').textContent =
-        `${currentPosition.lat.toFixed(5)}, ${currentPosition.lng.toFixed(5)} ±${currentPosition.acc.toFixed(0)}m (${accText})`;
+        `${currentPosition.lat.toFixed(5)}, ${currentPosition.lng.toFixed(5)} ±${currentPosition.acc.toFixed(0)}m · ${dist}m dari sekolah`;
       isLocating = false;
       checkReady();
     },
@@ -425,7 +444,7 @@ function getLocation() {
 function checkReady() {
   const teacher = document.getElementById('teacherSelect').value;
   const btn = document.getElementById('btnSubmit');
-  btn.disabled = !(teacher && capturedPhotoData && currentPosition);
+  btn.disabled = !(teacher && capturedPhotoData && currentPosition && currentPosition.inRange);
 }
 
 async function submitPresensi() {
