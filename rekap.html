@@ -134,6 +134,40 @@ td.hadir { color: #4ade80; }
 .spinner { width: 36px; height: 36px; border: 3px solid #1e293b; border-top-color: #fbbf24; border-radius: 50%; animation: spin .8s linear infinite; }
 @keyframes spin { to { transform: rotate(360deg); } }
 .loading-wrap p { color: #94a3b8; font-size: 14px; }
+/* PASSWORD GATE */
+.gate-overlay {
+  position: fixed; inset: 0; z-index: 9999;
+  background: #0a0f1a; display: flex;
+  align-items: center; justify-content: center; padding: 20px;
+}
+.gate-box {
+  background: #0f172a; border: 1px solid #1e293b; border-radius: 16px;
+  padding: 36px 28px 28px; max-width: 340px; width: 100%;
+  text-align: center; box-shadow: 0 20px 60px rgba(0,0,0,0.6);
+}
+.gate-box h2 { font-size: 18px; color: #fbbf24; margin-bottom: 4px; letter-spacing: 1px; }
+.gate-box p { font-size: 12px; color: #64748b; margin-bottom: 20px; }
+.gate-box input {
+  width: 100%; padding: 12px 14px; border-radius: 10px;
+  border: 1.5px solid #1e293b; background: #0b1120; color: #e2e8f0;
+  font-size: 16px; text-align: center; outline: none;
+  transition: border .2s; letter-spacing: 2px;
+}
+.gate-box input:focus { border-color: #fbbf24; }
+.gate-box input::placeholder { letter-spacing: 1px; font-size: 13px; }
+.gate-box .gate-err {
+  font-size: 12px; color: #f87171; margin-top: 10px; min-height: 20px;
+}
+.gate-box button {
+  width: 100%; padding: 12px; margin-top: 14px; border-radius: 10px;
+  border: none; background: #fbbf24; color: #0a0f1a;
+  font-size: 14px; font-weight: 700; cursor: pointer;
+  transition: all .15s;
+}
+.gate-box button:active { transform: scale(0.97); }
+.gate-box button:disabled { opacity: 0.4; cursor: not-allowed; }
+.main-content { display: none; }
+.main-content.show { display: block; }
 /* PERIOD BADGE */
 .period-badge {
   display: flex; align-items: center; justify-content: center; gap: 8px;
@@ -205,10 +239,21 @@ td.hadir { color: #4ade80; }
 </head>
 <body>
 
-<div class="top-bar">
-  <div class="logo">PRESENSI</div>
-  <div class="icons"><span title="Info">ℹ</span><span title="Atur">⚙</span></div>
+<div class="gate-overlay" id="gateOverlay">
+  <div class="gate-box">
+    <h2>PRESENSI</h2>
+    <p>Masukkan sandi untuk akses rekap</p>
+    <input type="password" id="passInput" placeholder="••••••••" onkeydown="gateKey(event)" autocomplete="off">
+    <div class="gate-err" id="gateErr"></div>
+    <button id="gateBtn" onclick="gateCheck()">Buka</button>
+  </div>
 </div>
+
+<div class="main-content" id="mainContent">
+  <div class="top-bar">
+    <div class="logo">PRESENSI</div>
+    <div class="icons"><span title="Info">ℹ</span><span title="Atur">⚙</span></div>
+  </div>
 
 <div class="metrics" id="metricsRow">
   <div class="metric gold"><div class="value" id="mTot">—</div><div class="lbl">Tepat Waktu</div><div class="sub" id="mTotSub"></div></div>
@@ -575,9 +620,38 @@ function showToast(msg, type) {
   t._timer = setTimeout(() => { t.style.opacity = '0'; }, 3000);
 }
 
+// ====== PASSWORD GATE ======
+const GATE_PASS = 'b1sm1llahdulu';
+function gateCheck() {
+  const inp = document.getElementById('passInput');
+  const err = document.getElementById('gateErr');
+  if (inp.value === GATE_PASS) {
+    sessionStorage.setItem('rekap_gate', '1');
+    document.getElementById('gateOverlay').style.display = 'none';
+    document.getElementById('mainContent').classList.add('show');
+    loadData();
+  } else {
+    err.textContent = '❌ Sandi salah';
+    inp.value = '';
+    inp.focus();
+    setTimeout(() => err.textContent = '', 2000);
+  }
+}
+function gateKey(e) {
+  if (e.key === 'Enter') gateCheck();
+}
+
 // ====== INIT ======
-document.addEventListener('DOMContentLoaded', loadData);
-document.getElementById('searchInput').addEventListener('input', filterTable);
+document.addEventListener('DOMContentLoaded', () => {
+  if (sessionStorage.getItem('rekap_gate') === '1') {
+    document.getElementById('gateOverlay').style.display = 'none';
+    document.getElementById('mainContent').classList.add('show');
+    loadData();
+  } else {
+    document.getElementById('passInput').focus();
+  }
+});
 </script>
+</div>
 </body>
 </html>
