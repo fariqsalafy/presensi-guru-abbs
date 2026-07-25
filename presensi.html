@@ -207,10 +207,16 @@ select::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
 <div class="toast" id="toast"></div>
 
 <script>
+// ====== SUPABASE CONFIG ======
 const SUPABASE_URL = 'https://xyypuwjpmbkxxlladqtp.supabase.co';
 const SUPABASE_KEY = 'sb_publishable_88Zpk6jMbR8yf4k56_AHtw_ersLMAq6';
 const TABLE = 'presensi_guru';
-const TODAY = new Date().toISOString().slice(0,10);
+// Gunakan WIB (UTC+7) untuk tanggal
+function todayWIB() {
+  const d = new Date(Date.now() + 7 * 3600000);
+  return d.toISOString().slice(0,10);
+}
+const TODAY = todayWIB();
 
 const TEACHERS = [
   "Adila Rahmah","Amien Nur Wicaksono","Andi Wijayanto","Arfian Moneter Pratama",
@@ -451,6 +457,7 @@ async function submitPresensi() {
     photo_data: capturedPhotoData,
     latitude: currentPosition.lat,
     longitude: currentPosition.lng,
+    tgl: TODAY,
     location_accuracy: currentPosition.acc
   };
 
